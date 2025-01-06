@@ -1,48 +1,45 @@
-# Product Name
+# M5Unit - DISTANCE
 
 ## Overview
 
-### SKU:xxx
+Library for DISTANCE using [M5UnitUnified](https://github.com/m5stack/M5UnitUnified).  
+M5UnitUnified is a library for unified handling of various M5 units products.
 
-Description of the product
+### SKU:U098-B1
+
+UNIT SONIC I2C is an I2C interface ultrasonic distance sensor. This allows for easy I2C integration and multi-sensor operation using a single BUS, to save I/O resources. The module features an RCWL-9620 ultrasonic distance measurement chip with a 16mm probe, which the ranging accuracy can reach 2cm-450cm(accuracy up to ±2%). It is ideal to apply in robotics obstacle avoidance, fluid level detection, and other applications that require you to perform measurements.
+
 
 ## Related Link
+See also examples using conventional methods here.
 
-- [Document & Datasheet](https://docs.m5stack.com/en/unit/product_Link)
+- [Unit Ultrasonic-I2C & Datasheet](https://docs.m5stack.com/ja/unit/ULTRASONIC%20I2C)
 
-## Required Libraries:
-
-- [Adafruit_BMP280_Library](https://github.com/adafruit/Required_Libraries_Link)
+### Required Libraries:
+- [M5UnitUnified](https://github.com/m5stack/M5UnitUnified)
+- [M5Utility](https://github.com/m5stack/M5Utility)
+- [M5HAL](https://github.com/m5stack/M5HAL)
 
 ## License
 
-- [Product Name- MIT](LICENSE)
+- [M5Unit-DISTANCE - MIT](LICENSE)
 
-## Remaining steps(Editorial Staff Look,After following the steps, remember to delete all the content below)
+## Examples
+See also [examples/UnitUnified](examples/UnitUnified)
 
-1. Change [clang format check path](./.github/workflows/clang-format-check.yml#L9-L15).
-2. Add License content to [LICENSE](/LICENSE).
-3. Change link on line 78 of [bug-report.yml](./.github/ISSUE_TEMPLATE/bug-report.yml#L78).
+### Doxygen document
+[GitHub Pages](https://m5stack.github.io/M5Unit-DISTANCE/)
 
-```cpp
-Example
-# M5Unit-ENV
+If you want to generate documents on your local machine, execute the following command
 
-## Overview
-
-### SKU:U001 & U001-B & U001-C
-
-Contains M5Stack-**UNIT ENV** series related case programs.ENV is an environmental sensor with integrated SHT30 and QMP6988 internally to detect temperature, humidity, and atmospheric pressure data.
-
-## Related Link
-
-- [Document & Datasheet](https://docs.m5stack.com/en/unit/envIII)
-
-## Required Libraries:
-
-- [Adafruit_BMP280_Library](https://github.com/adafruit/Adafruit_BMP280_Library)
-
-## License
-
-- [M5Unit-ENV - MIT](LICENSE)
 ```
+bash docs/doxy.sh
+```
+
+It will output it under docs/html  
+If you want to output Git commit hashes to html, do it for the git cloned folder.
+
+#### Required
+- [Doxyegn](https://www.doxygen.nl/)
+- [pcregrep](https://formulae.brew.sh/formula/pcre2)
+- [Git](https://git-scm.com/) (Output commit hash to html)
