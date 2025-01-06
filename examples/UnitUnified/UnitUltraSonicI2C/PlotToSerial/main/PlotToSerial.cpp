@@ -15,7 +15,11 @@ namespace {
 auto& lcd = M5.Display;
 m5::unit::UnitUnified Units;
 m5::unit::UnitUltraSonicI2C unit;
+constexpr uint32_t interval{125};
+
 }  // namespace
+
+using namespace m5::unit::rcwl9620;
 
 void setup()
 {
@@ -30,6 +34,10 @@ void setup()
     M5_LOGI("getPin: SDA:%u SCL:%u", pin_num_sda, pin_num_scl);
     Wire.end();
     Wire.begin(pin_num_sda, pin_num_scl, 100 * 1000U);
+
+    auto cfg        = unit.config();
+    cfg.interval_ms = interval;
+    unit.config(cfg);
 
     if (!Units.add(unit, Wire) || !Units.begin()) {
         M5_LOGE("Failed to begin");
@@ -49,7 +57,7 @@ void setup()
 void loop()
 {
     M5.update();
-    //    auto touch = M5.Touch.getDetail();
+    auto touch = M5.Touch.getDetail();
 
     // Periodic
     Units.update();
@@ -59,5 +67,14 @@ void loop()
         lcd.fillRect(8, 8, 8 * 24, 16 * 1, TFT_BLACK);
         lcd.setCursor(8, 8 + 16 * 0);
         lcd.printf("Distance:%.2f mm", unit.distance());
+    }
+
+    if (M5.BtnA.wasClicked() || touch.wasClicked()) {
+        unit.stopPeriodicMeasurement();
+        Data d{};
+        if (unit.measureSingleshot(d)) {
+            M5_LOGI("Single: %.2f mm", d.distance());
+        }
+        unit.startPeriodicMeasurement(interval);
     }
 }

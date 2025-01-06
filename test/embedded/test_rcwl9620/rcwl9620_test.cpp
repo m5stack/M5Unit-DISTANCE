@@ -23,7 +23,7 @@ using m5::unit::types::elapsed_time_t;
 
 const ::testing::Environment* global_fixture = ::testing::AddGlobalTestEnvironment(new GlobalFixture<100000U>());
 
-constexpr uint32_t STORED_SIZE{4};
+constexpr uint32_t STORED_SIZE{8};
 
 class TestRCWL9620 : public ComponentTestBase<UnitRCWL9620, bool> {
 protected:
@@ -49,6 +49,43 @@ INSTANTIATE_TEST_SUITE_P(ParamValues, TestRCWL9620, ::testing::Values(false));
 
 namespace {
 
+template <class U>
+elapsed_time_t test_periodic(U* unit, const uint32_t times, const uint32_t measure_duration = 0)
+{
+    auto tm         = unit->interval();
+    auto timeout_at = m5::utility::millis() + 10 * 1000;
+
+    do {
+        unit->update();
+        if (unit->updated()) {
+            break;
+        }
+        std::this_thread::yield();
+    } while (!unit->updated() && m5::utility::millis() <= timeout_at);
+    // timeout
+    if (!unit->updated()) {
+        return 0;
+    }
+
+    //
+    uint32_t measured{};
+    auto start_at = m5::utility::millis();
+    timeout_at    = start_at + (times * (tm + measure_duration) * 2);
+
+    do {
+        unit->update();
+        measured += unit->updated() ? 1 : 0;
+        if (measured >= times) {
+            break;
+        }
+        // std::this_thread::yield();
+        m5::utility::delay(1);
+
+    } while (measured < times && m5::utility::millis() <= timeout_at);
+    return (measured == times) ? m5::utility::millis() - start_at : 0;
+    // return (measured == times) ? unit->updatedMillis() - start_at : 0;
+}
+
 }  // namespace
 
 TEST_P(TestRCWL9620, Periodic)
@@ -60,61 +97,59 @@ TEST_P(TestRCWL9620, Periodic)
     EXPECT_TRUE(unit->stopPeriodicMeasurement());
     EXPECT_FALSE(unit->inPeriodic());
 
-#if 0    
-    for (auto&& iir : iir_table) {
-        for (auto&& fir : fir_table) {
-            if (m5::stl::to_underlying(fir) < 4) {
-                continue;
-            }
+    EXPECT_FALSE(unit->startPeriodicMeasurement(99));
 
-            auto s = m5::utility::formatString("IIR:%u FIR:%u", iir, fir);
-            SCOPED_TRACE(s);
+    constexpr uint32_t it{150};
 
-            //                EXPECT_TRUE(unit->startPeriodicMeasurement(iir, fir, Gain::Coeff12_5, irs));
-            EXPECT_TRUE(unit->startPeriodicMeasurement(iir, fir, Gain::Coeff12_5, IRSensor::Dual));
-            EXPECT_TRUE(unit->inPeriodic());
+    EXPECT_TRUE(unit->startPeriodicMeasurement(it));
+    auto elapsed = test_periodic(unit.get(), STORED_SIZE, it);
 
-            auto tm      = get_interval(iir, fir);
-            auto elapsed = test_periodic(unit.get(), STORED_SIZE, tm ? tm : 1);
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+    EXPECT_FALSE(unit->inPeriodic());
 
-            EXPECT_TRUE(unit->stopPeriodicMeasurement());
-            EXPECT_FALSE(unit->inPeriodic());
+    EXPECT_NE(elapsed, 0);
+    EXPECT_GE(elapsed, STORED_SIZE * it);
 
-            EXPECT_NE(elapsed, 0);
-            EXPECT_GE(elapsed + 2, STORED_SIZE * (tm ? tm : 1));
+    //
+    EXPECT_EQ(unit->available(), STORED_SIZE);
+    EXPECT_FALSE(unit->empty());
+    EXPECT_TRUE(unit->full());
 
-            M5_LOGI("TM:%u IT:%u e:%ld", tm, unit->interval(), elapsed);
-
-            //
-            EXPECT_EQ(unit->available(), STORED_SIZE);
-            EXPECT_FALSE(unit->empty());
-            EXPECT_TRUE(unit->full());
-
-            uint32_t cnt{STORED_SIZE / 2};
-            while (cnt-- && unit->available()) {
-                EXPECT_TRUE(std::isfinite(unit->ambientTemperature()));
-                EXPECT_FLOAT_EQ(unit->ambientTemperature(), unit->oldest().ambientTemperature());
-                EXPECT_TRUE(std::isfinite(unit->objectTemperature1()));
-                EXPECT_FLOAT_EQ(unit->objectTemperature1(), unit->oldest().objectTemperature1());
-                EXPECT_TRUE(std::isfinite(unit->objectTemperature2()));
-                EXPECT_FLOAT_EQ(unit->objectTemperature2(), unit->oldest().objectTemperature2());
-
-                EXPECT_FALSE(unit->empty());
-                unit->discard();
-            }
-            EXPECT_EQ(unit->available(), STORED_SIZE / 2);
-            EXPECT_FALSE(unit->empty());
-            EXPECT_FALSE(unit->full());
-
-            unit->flush();
-            EXPECT_EQ(unit->available(), 0);
-            EXPECT_TRUE(unit->empty());
-            EXPECT_FALSE(unit->full());
-
-            EXPECT_FALSE(std::isfinite(unit->ambientTemperature()));
-            EXPECT_FALSE(std::isfinite(unit->objectTemperature1()));
-            EXPECT_FALSE(std::isfinite(unit->objectTemperature2()));
-        }
+    uint32_t cnt{STORED_SIZE / 2};
+    while (cnt-- && unit->available()) {
+        EXPECT_TRUE(std::isfinite(unit->distance()));
+        EXPECT_FLOAT_EQ(unit->distance(), unit->oldest().distance());
+        EXPECT_FALSE(unit->empty());
+        unit->discard();
     }
-#endif
+    EXPECT_EQ(unit->available(), STORED_SIZE / 2);
+    EXPECT_FALSE(unit->empty());
+    EXPECT_FALSE(unit->full());
+
+    unit->flush();
+    EXPECT_EQ(unit->available(), 0);
+    EXPECT_TRUE(unit->empty());
+    EXPECT_FALSE(unit->full());
+
+    EXPECT_FALSE(std::isfinite(unit->distance()));
+}
+
+TEST_P(TestRCWL9620, Singleshot)
+{
+    SCOPED_TRACE(ustr);
+
+    Data d{};
+
+    EXPECT_TRUE(unit->inPeriodic());
+    EXPECT_FALSE(unit->measureSingleshot(d));
+
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+    EXPECT_FALSE(unit->inPeriodic());
+
+    uint32_t cnt{8};
+    while (cnt--) {
+        EXPECT_TRUE(unit->measureSingleshot(d));
+        EXPECT_TRUE(std::isfinite(d.distance()));
+        //        M5_LOGW("[%u]:%f", cnt, d.distance());
+    }
 }
