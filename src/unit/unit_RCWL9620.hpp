@@ -111,7 +111,7 @@ public:
       @brief Start periodic measurement
       @param interval Measurement interval (ms)
       @return True if successful
-      @note Interval must be at least 100 ms
+      @note Interval must be at least 150 ms
     */
     inline bool startPeriodicMeasurement(const uint32_t interval)
     {
