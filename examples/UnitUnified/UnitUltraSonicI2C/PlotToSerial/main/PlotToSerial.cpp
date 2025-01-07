@@ -15,7 +15,7 @@ namespace {
 auto& lcd = M5.Display;
 m5::unit::UnitUnified Units;
 m5::unit::UnitUltraSonicI2C unit;
-constexpr uint32_t interval{125};
+constexpr uint32_t interval{150};
 
 }  // namespace
 
