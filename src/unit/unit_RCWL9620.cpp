@@ -30,7 +30,7 @@ namespace unit {
 // class UnitRCWL9620
 const char UnitRCWL9620::name[] = "UnitRCWL9620";
 const types::uid_t UnitRCWL9620::uid{"UnitRCWL9620"_mmh3};
-const types::uid_t UnitRCWL9620::attr{0};
+const types::attr_t UnitRCWL9620::attr{attribute::AccessI2C};
 
 bool UnitRCWL9620::begin()
 {
