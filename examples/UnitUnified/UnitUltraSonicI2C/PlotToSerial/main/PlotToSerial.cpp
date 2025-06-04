@@ -62,7 +62,7 @@ void loop()
     // Periodic
     Units.update();
     if (unit.updated()) {
-        M5_LOGI("\n>Distance:%f Raw:%x", unit.distance(), unit.oldest().raw_distance());
+        M5.Log.printf("Distance:%f Raw:%x\n", unit.distance(), unit.oldest().raw_distance());
 
         lcd.fillRect(8, 8, 8 * 24, 16 * 1, TFT_BLACK);
         lcd.setCursor(8, 8 + 16 * 0);
@@ -73,7 +73,7 @@ void loop()
         unit.stopPeriodicMeasurement();
         Data d{};
         if (unit.measureSingleshot(d)) {
-            M5_LOGI("Single: %.2f mm", d.distance());
+            M5.Log.printf("Single: %.2f mm\n", d.distance());
         }
         unit.startPeriodicMeasurement(interval);
     }
