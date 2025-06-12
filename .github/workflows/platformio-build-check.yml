@@ -106,14 +106,17 @@ jobs:
             unit: UnitUltraSonic
             board: CoreS3
             framework: Arduino
+            espressif32: latest
           - example: DualSensor
             unit: UnitUltraSonic
             board: Fire
             framework: Arduino
+            espressif32: latest
           - example: DualSensor
             unit: UnitUltraSonic
             board: Paper
             framework: Arduino
+            espressif32: latest
 
     steps:
       - name: Checkout
