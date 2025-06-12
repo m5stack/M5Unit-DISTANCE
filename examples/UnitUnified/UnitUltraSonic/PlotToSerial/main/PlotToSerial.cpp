@@ -9,7 +9,6 @@
 #include <M5Unified.h>
 #include <M5UnitUnified.h>
 #include <M5UnitUnifiedDISTANCE.h>
-#include <M5UnitUnifiedHUB.h>
 #include <M5Utility.h>
 
 // *********************************************************************
@@ -33,8 +32,6 @@ constexpr uint32_t interval{50};  // For GPIO, the measurement interval is 50 ms
 #error "Choose connection"
 #endif
 
-m5::unit::UnitPbHub hub;
-
 }  // namespace
 
 using namespace m5::unit::rcwl9620;
@@ -50,25 +47,7 @@ void setup()
     auto cfg        = unit.config();
     cfg.interval_ms = interval;
     unit.config(cfg);
-#if 1
-    // PortA as I2C
-    M5.Log.printf("Using I2C\n");
-    auto pin_num_sda = M5.getPin(m5::pin_name_t::port_a_sda);
-    auto pin_num_scl = M5.getPin(m5::pin_name_t::port_a_scl);
-    M5_LOGI("getPin: SDA:%u SCL:%u", pin_num_sda, pin_num_scl);
-    Wire.end();
-    Wire.begin(pin_num_sda, pin_num_scl, 400 * 1000U);
 
-    if (!hub.add(unit, 0) || !Units.add(hub, Wire) || !Units.begin()) {
-        M5_LOGE("Failed to begin");
-        lcd.clear(TFT_RED);
-        while (true) {
-            m5::utility::delay(10000);
-        }
-    }
-#endif
-    
-#if 0
 #if defined(CONNECT_VIA_I2C)
     // PortA as I2C
     M5.Log.printf("Using I2C\n");
@@ -105,7 +84,6 @@ void setup()
             m5::utility::delay(10000);
         }
     }
-#endif
 #endif
 
     M5_LOGI("M5UnitUnified has been begun");
