@@ -65,7 +65,8 @@ jobs:
           - PlotToSerial
 
         unit:
-          - UnitUltraSonic
+          - UnitUltraSonicI2C
+          - UnitUltraSonicIO
 
         board:
           - Core
