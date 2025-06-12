@@ -17,13 +17,13 @@ Unit Ultrasonic-IO is a GPIO interface ultrasonic distance measurement sensor. T
 
 ## Future Plans
 - Unit Ultrasonic(SKU:U098) will support soon.
-- Unit Ultrasonic-IO(SKU:U098-B2) will support soon.
 
 
 ## Related Link
 See also examples using conventional methods here.
 
 - [Unit Ultrasonic-I2C & Datasheet](https://docs.m5stack.com/ja/unit/ULTRASONIC%20I2C)
+- [Unit Ultrasonic-IO & Datasheet](https://docs.m5stack.com/en/unit/UNIT%20SONIC%20IO)
 
 ### Required Libraries:
 - [M5UnitUnified](https://github.com/m5stack/M5UnitUnified)
@@ -33,6 +33,16 @@ See also examples using conventional methods here.
 ## License
 
 - [M5Unit-DISTANCE - MIT](LICENSE)
+
+
+### Support via [PbHub](https://docs.m5stack.com/en/unit/pbhub_1.1)
+
+|Unit|Support|
+|---|---|
+|UnitUltraSonicIO|NG|
+
+See also [M5Unit-HUB](https://github.com/m5stack/M5Unit-HUB)
+
 
 ## Examples
 See also [examples/UnitUnified](examples/UnitUnified)
