@@ -15,7 +15,10 @@
 namespace {
 auto& lcd = M5.Display;
 m5::unit::UnitUnified Units;
-m5::unit::UnitUltraSonic unit[2];  // [0]:I2C [1]:IO(GPIO)
+m5::unit::UnitUltraSonicI2C unitI2C;
+m5::unit::UnitUltraSonicIO unitIO;
+m5::unit::UnitRCWL9620* unit[2] = {&unitI2C, &unitIO};
+
 const char* type_table[] = {"I2C", "GPIO"};
 }  // namespace
 
@@ -46,8 +49,8 @@ void setup()
     Wire.end();
     Wire.begin(pin_num_sda, pin_num_scl, 100 * 1000U);
 
-    if (!Units.add(unit[0], Wire) ||                               // unit[0] I2C
-        !Units.add(unit[1], pin_num_gpio_in, pin_num_gpio_out) ||  // unit[1] GPIO
+    if (!Units.add(unitI2C, Wire) ||                              // unit[0] I2C
+        !Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) ||  // unit[1] GPIO
         !Units.begin()) {
         M5_LOGE("Failed to begin");
         lcd.clear(TFT_RED);
@@ -71,13 +74,13 @@ void loop()
     Units.update();
 
     for (uint32_t i = 0; i < m5::stl::size(unit); ++i) {
-        m5::unit::UnitRCWL9620& u = unit[i];
-        if (u.updated()) {
-            M5.Log.printf(">%s_Distance:%f\n>%s_Raw:%u\n", type_table[i], u.distance(), type_table[i],
-                          u.oldest().raw_distance());
+        m5::unit::UnitRCWL9620* u = unit[i];
+        if (u->updated()) {
+            M5.Log.printf(">%s_Distance:%f\n>%s_Raw:%u\n", type_table[i], u->distance(), type_table[i],
+                          u->oldest().raw_distance());
 
             lcd.setCursor(8, lcd.height() / 2 * i);
-            lcd.printf("%5s:%4.0f mm", type_table[i], u.distance());
+            lcd.printf("%5s:%4.0f mm", type_table[i], u->distance());
         }
     }
 }
