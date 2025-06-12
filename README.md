@@ -10,6 +10,11 @@ M5UnitUnified is a library for unified handling of various M5 units products.
 UNIT SONIC I2C is an I2C interface ultrasonic distance sensor. This allows for easy I2C integration and multi-sensor operation using a single BUS, to save I/O resources. The module features an RCWL-9620 ultrasonic distance measurement chip with a 16mm probe, which the ranging accuracy can reach 2cm-450cm(accuracy up to ±2%). It is ideal to apply in robotics obstacle avoidance, fluid level detection, and other applications that require you to perform measurements.
 
 
+### SKU:U098-B2
+
+Unit Ultrasonic-IO is a GPIO interface ultrasonic distance measurement sensor. The hardware uses the RCWL-9620 ultrasonic distance measurement single-chip combined with a 16 mm probe, capable of achieving precise distance measurement within the range of 2 cm-450 cm (accuracy up to ±2%). After the controller sends a trigger signal, the sensor outputs a pulse duration corresponding to the sound wave reflection time, and the distance can be calculated from this data. The IO control method gives this sensor an extremely fast response speed, making it very suitable for applications such as robot obstacle avoidance and liquid level detection.
+
+
 ## Future Plans
 - Unit Ultrasonic(SKU:U098) will support soon.
 - Unit Ultrasonic-IO(SKU:U098-B2) will support soon.
@@ -48,3 +53,5 @@ If you want to output Git commit hashes to html, do it for the git cloned folder
 - [Doxyegn](https://www.doxygen.nl/)
 - [pcregrep](https://formulae.brew.sh/formula/pcre2)
 - [Git](https://git-scm.com/) (Output commit hash to html)
+
+
