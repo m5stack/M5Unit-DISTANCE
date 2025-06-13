@@ -50,7 +50,7 @@ struct Data {
 }  // namespace rcwl9620
 
 /*!
-  @class UnitRCWL9620
+  @class m5::unit::UnitRCWL9620
   @brief An ultrasonic distance measuring sensor unit
 */
 class UnitRCWL9620 : public Component, public PeriodicMeasurementAdapter<UnitRCWL9620, rcwl9620::Data> {
@@ -64,8 +64,8 @@ public:
     struct config_t {
         //! Start periodic measurement on begin?
         bool start_periodic{true};
-        //! Interval time if start on begin (ms) (150-)
-        uint32_t interval_ms{150};
+        //! Interval time if start on begin (ms) (100-)
+        uint32_t interval_ms{250};
     };
 
     explicit UnitRCWL9620(const uint8_t addr = DEFAULT_ADDRESS)
@@ -111,7 +111,6 @@ public:
       @brief Start periodic measurement
       @param interval Measurement interval (ms)
       @return True if successful
-      @note Interval must be at least 150 ms
     */
     inline bool startPeriodicMeasurement(const uint32_t interval)
     {
@@ -138,17 +137,54 @@ public:
     bool measureSingleshot(rcwl9620::Data& d);
     ///@}
 
+    ///@cond0
+    // Class that abstracts the interaction between classes and adapters
+    class Interface {
+    public:
+        explicit Interface(UnitRCWL9620& u) : _unit{u}
+        {
+        }
+        virtual ~Interface()
+        {
+        }
+        virtual bool read_measurement(rcwl9620::Data&, bool&) = 0;
+        virtual bool request_measurement()                    = 0;
+
+    protected:
+        UnitRCWL9620& _unit;
+    };
+    ///@endcond
+
 protected:
     bool request_measurement();
-    bool read_measurement(rcwl9620::Data& d);
+    bool read_measurement(rcwl9620::Data& d, bool& timeouted);
 
     bool start_periodic_measurement(const uint32_t interval);
     bool stop_periodic_measurement();
 
+    inline Interface* interface()
+    {
+        return _interface.get();
+    }
+
     M5_UNIT_COMPONENT_PERIODIC_MEASUREMENT_ADAPTER_HPP_BUILDER(UnitRCWL9620, rcwl9620::Data);
 
-private:
     std::unique_ptr<m5::container::CircularBuffer<rcwl9620::Data>> _data{};
+
+    inline virtual uint32_t minimum_interval() const
+    {
+        // Datasheet says
+        // 向模块写入 0X01 ，模块开始测距；等待 100mS 模块最大测距时间
+        // Note : Max is assumed to be 50+100 since there is no description of Max.
+        // A larger value would be considered better?
+
+        // As a result of the experiment, it seems that in 100ms, 263 in requestFrom is returned in many cases.
+        // Therefore, the value should be increased.
+        return 150;  // for I2C
+    }
+
+private:
+    std::unique_ptr<Interface> _interface{};
     config_t _cfg{};
 };
 

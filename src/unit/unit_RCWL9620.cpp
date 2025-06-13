@@ -9,7 +9,6 @@
 */
 #include "unit_RCWL9620.hpp"
 #include <M5Utility.hpp>
-#include <thread>
 
 using namespace m5::utility::mmh3;
 using namespace m5::unit::types;
@@ -17,20 +16,92 @@ using namespace m5::unit::rcwl9620;
 using namespace m5::unit::rcwl9620::command;
 
 namespace {
-// Datasheet says
-// 向模块写入 0X01 ，模块开始测距；等待 100mS 模块最大测距时间
-// Note : Max is assumed to be 50+100 since there is no description of Max.
-// A larger value would be considered better?
-constexpr uint32_t minimum_interval{150};
 }  // namespace
 
 namespace m5 {
 namespace unit {
 
+// Class that abstracts the interaction between classes and adapters
+// For I2C
+class InterfaceI2C : public UnitRCWL9620::Interface {
+public:
+    explicit InterfaceI2C(UnitRCWL9620& u) : UnitRCWL9620::Interface(u)
+    {
+    }
+    virtual ~InterfaceI2C()
+    {
+    }
+    virtual bool read_measurement(Data& d, bool& timeouted) override
+    {
+        timeouted = false;
+        std::fill(d.raw.begin(), d.raw.end(), 0x00);
+        uint32_t cnt{4};
+        do {
+            if (_unit.readWithTransaction(d.raw.data(), d.raw.size()) == m5::hal::error::error_t::OK) {
+                _requested = false;
+                return true;
+            }
+            timeouted = true;
+        } while (cnt--);
+        return false;
+    }
+    inline virtual bool request_measurement() override
+    {
+        if (!_requested) {
+            _requested = _unit.writeRegister(MEASURE_DISTANCE, nullptr, 0);
+        }
+        return _requested;
+    }
+    bool _requested{};
+};
+
+// For GPIO
+class InterfaceGPIO : public UnitRCWL9620::Interface {
+public:
+    explicit InterfaceGPIO(UnitRCWL9620& u) : UnitRCWL9620::Interface(u)
+    {
+        _unit.pinModeRX(gpio::Mode::Input);
+        _unit.pinModeTX(gpio::Mode::Output);
+        _unit.writeDigitalTX(false);
+    }
+    virtual ~InterfaceGPIO()
+    {
+    }
+    virtual bool read_measurement(Data& d, bool& timeouted) override
+    {
+        std::fill(d.raw.begin(), d.raw.end(), 0x00);
+
+        // Request
+        _unit.writeDigitalTX(LOW);
+        m5::utility::delayMicroseconds(2);
+        _unit.writeDigitalTX(HIGH);
+        m5::utility::delayMicroseconds(10);
+        _unit.writeDigitalTX(LOW);
+
+        // Read
+        uint32_t duration{};
+        if (!_unit.pulseInRX(duration, HIGH, 50000)) {
+            return false;
+        }
+
+        const uint32_t distance_mm = static_cast<uint32_t>(duration * 0.343f / 2.0f);
+        const uint32_t distance_um = static_cast<uint32_t>(distance_mm * 1000.0f);
+        d.raw[0]                   = (distance_um >> 16) & 0xFF;
+        d.raw[1]                   = (distance_um >> 8) & 0xFF;
+        d.raw[2]                   = distance_um & 0xFF;
+        return true;
+    }
+    virtual bool request_measurement() override
+    {
+        // Ignored because request and read are not separated by GPIO
+        return true;
+    }
+};
+
 // class UnitRCWL9620
 const char UnitRCWL9620::name[] = "UnitRCWL9620";
 const types::uid_t UnitRCWL9620::uid{"UnitRCWL9620"_mmh3};
-const types::attr_t UnitRCWL9620::attr{attribute::AccessI2C};
+const types::attr_t UnitRCWL9620::attr{attribute::AccessI2C | attribute::AccessGPIO};
 
 bool UnitRCWL9620::begin()
 {
@@ -44,9 +115,22 @@ bool UnitRCWL9620::begin()
         }
     }
 
-    // May be in the requested state, so data is retrieved and discarded
-    Data discard{};
-    read_measurement(discard);
+    // Check adapter type
+    auto atype = adapter()->type();
+    switch (atype) {
+        case Adapter::Type::I2C:
+            _interface.reset(new InterfaceI2C(*this));
+            break;
+        case Adapter::Type::GPIO:
+            _interface.reset(new InterfaceGPIO(*this));
+            break;
+        default:
+            break;
+    }
+    if (!_interface) {
+        M5_LIB_LOGE("Invalid adapter %u", atype);
+        return false;
+    }
 
     return _cfg.start_periodic ? startPeriodicMeasurement(_cfg.interval_ms) : true;
 }
@@ -57,16 +141,20 @@ void UnitRCWL9620::update(const bool force)
     if (inPeriodic()) {
         elapsed_time_t at{m5::utility::millis()};
         if (force || !_latest || at >= _latest + _interval) {
+            bool timeouted{};
             Data d{};
-            _updated = read_measurement(d);
+            _updated = read_measurement(d, timeouted);
             if (_updated) {
-                _latest = at;
-                _data->push_back(d);
+                // Data is invalid after Timeout has occurred
+                if (!timeouted) {
+                    _data->push_back(d);
+                }
                 if (!request_measurement()) {
                     _periodic = false;
                     M5_LIB_LOGE("Periodic measurements have been suspended");
                     return;
                 }
+                _latest = m5::utility::millis();
             }
         }
     }
@@ -79,9 +167,10 @@ bool UnitRCWL9620::measureSingleshot(rcwl9620::Data& d)
         return false;
     }
 
+    bool timeouted{};
     if (request_measurement()) {
         m5::utility::delay(100);
-        return read_measurement(d);
+        return read_measurement(d, timeouted) && !timeouted;
     }
     return false;
 }
@@ -93,8 +182,8 @@ bool UnitRCWL9620::start_periodic_measurement(const uint32_t interval)
         return false;
     }
 
-    if (interval < minimum_interval) {
-        M5_LIB_LOGE("Interval must be greater equal %u, %u", minimum_interval, interval);
+    if (interval < minimum_interval()) {
+        M5_LIB_LOGE("Interval must be greater equal %u, (%u)", minimum_interval(), interval);
         return false;
     }
 
@@ -118,9 +207,10 @@ bool UnitRCWL9620::stop_periodic_measurement()
         m5::utility::delay(dms);
 
         uint32_t cnt{8};
+        bool timeouted{};
         Data discard{};
         do {
-            if (read_measurement(discard)) {
+            if (read_measurement(discard, timeouted)) {
                 _periodic = false;
                 return true;
             }
@@ -133,20 +223,13 @@ bool UnitRCWL9620::stop_periodic_measurement()
 bool UnitRCWL9620::request_measurement()
 {
     // Only write command
-    return writeRegister(MEASURE_DISTANCE, nullptr, 0);
+    //    return writeRegister(MEASURE_DISTANCE, nullptr, 0);
+    return _interface->request_measurement();
 }
 
-bool UnitRCWL9620::read_measurement(rcwl9620::Data& d)
+bool UnitRCWL9620::read_measurement(rcwl9620::Data& d, bool& timeouted)
 {
-    std::fill(d.raw.begin(), d.raw.end(), 0x00);
-    uint32_t cnt{8};
-    do {
-        if (readWithTransaction(d.raw.data(), d.raw.size()) == m5::hal::error::error_t::OK) {
-            return true;
-        }
-        std::this_thread::yield();
-    } while (cnt--);
-    return false;
+    return _interface->read_measurement(d, timeouted);
 }
 
 }  // namespace unit

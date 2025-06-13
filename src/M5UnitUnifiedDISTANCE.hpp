@@ -14,6 +14,7 @@
 #define M5_UNIT_UNIFIED_DISTANCE_HPP
 
 #include "unit/unit_RCWL9620.hpp"
+#include "unit/unit_UltraSonic.hpp"
 
 /*!
   @namespace m5
@@ -26,9 +27,6 @@ namespace m5 {
   @brief Unit-related namespace
  */
 namespace unit {
-
-using UnitUltraSonicI2C = m5::unit::UnitRCWL9620;
-
 }  // namespace unit
 }  // namespace m5
 #endif

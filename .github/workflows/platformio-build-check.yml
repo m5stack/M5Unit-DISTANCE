@@ -21,7 +21,7 @@ on:
       - 'examples/UnitUnified/**.hpp'
       - 'examples/UnitUnified/**.h'
       - 'examples/UnitUnified/**.c'
-      - '/platformio-build-check.yml'
+      - '**/platformio-build-check.yml'
       - '**platformio.ini'
   pull_request:
     paths:
@@ -58,7 +58,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      #max-parallel: 1
+      max-parallel: 20
       
       matrix:
         example:
@@ -66,6 +66,7 @@ jobs:
 
         unit:
           - UnitUltraSonicI2C
+          - UnitUltraSonicIO
 
         board:
           - Core
@@ -88,39 +89,34 @@ jobs:
 
         espressif32:
           - latest
-#          - '5_4_0'
-#          - '4_4_0'
 
-#        exclude:
-#          - board: CoreS3
-#            espressif32: '5_4_0'
-#          - board: CoreS3
-#            espressif32: '4_4_0'
-#          - board: StampS3
-#            espressif32: '5_4_0'
-#          - board: StampS3
-#            espressif32: '4_4_0'
-#          - board: AtomS3
-#            espressif32: '5_4_0'
-#          - board: AtomS3
-#            espressif32: '4_4_0'
-#          - board: Dial
-#            espressif32: '5_4_0'
-#          - board: Dial
-#            espressif32: '4_4_0'
-#          - board: NanoC6
-#            espressif32: '5_4_0'
-#          - board: NanoC6
-#            espressif32: '4_4_0'
-#          - board: StickCPlus
-#            espressif32: '5_4_0'
-#          - board: StickCPlus
-#            espressif32: '4_4_0'
-#          - board: Paper
-#            espressif32: '5_4_0'
-#          - board: Paper
-#            espressif32: '4_4_0'
-
+        include:
+          # Specific sketches
+          - example: DualSensor
+            unit: UnitUltraSonic
+            board: Core
+            framework: Arduino
+            espressif32: latest
+          - example: DualSensor
+            unit: UnitUltraSonic
+            board: Core2
+            framework: Arduino
+            espressif32: latest
+          - example: DualSensor
+            unit: UnitUltraSonic
+            board: CoreS3
+            framework: Arduino
+            espressif32: latest
+          - example: DualSensor
+            unit: UnitUltraSonic
+            board: Fire
+            framework: Arduino
+            espressif32: latest
+          - example: DualSensor
+            unit: UnitUltraSonic
+            board: Paper
+            framework: Arduino
+            espressif32: latest
 
     steps:
       - name: Checkout
@@ -139,3 +135,4 @@ jobs:
 #          silent: false
 #          verbose: true
 #          disable-auto-clean: false
+
