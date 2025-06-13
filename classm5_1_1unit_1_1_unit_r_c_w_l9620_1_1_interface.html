@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.11.0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>M5Unit-DISTANCE: src/unit/unit_RCWL9620.cpp File Reference</title>
+<title>M5Unit-DISTANCE: m5::unit::UnitRCWL9620::Interface Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -70,7 +70,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function(){initNavTree('unit___r_c_w_l9620_8cpp.html',''); initResizable(true); });
+$(function(){initNavTree('classm5_1_1unit_1_1_unit_r_c_w_l9620_1_1_interface.html',''); initResizable(true); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -97,38 +97,54 @@ $(function(){initNavTree('unit___r_c_w_l9620_8cpp.html',''); initResizable(true)
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
-  <div class="headertitle"><div class="title">unit_RCWL9620.cpp File Reference</div></div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="classm5_1_1unit_1_1_unit_r_c_w_l9620_1_1_interface-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">m5::unit::UnitRCWL9620::Interface Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>RCWL9620 Unit for M5UnitUnified.  
-<a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="unit___r_c_w_l9620_8hpp_source.html">unit_RCWL9620.hpp</a>&quot;</code><br />
-<code>#include &lt;M5Utility.hpp&gt;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classm5_1_1unit_1_1_interface_i2_c.html">m5::unit::InterfaceI2C</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classm5_1_1unit_1_1_interface_g_p_i_o.html">m5::unit::InterfaceGPIO</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<p>@cond0  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="unit___r_c_w_l9620_8hpp_source.html">unit_RCWL9620.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for m5::unit::UnitRCWL9620::Interface:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classm5_1_1unit_1_1_unit_r_c_w_l9620_1_1_interface.png" usemap="#m5::unit::UnitRCWL9620::Interface_map" alt=""/>
+  <map id="m5::unit::UnitRCWL9620::Interface_map" name="m5::unit::UnitRCWL9620::Interface_map">
+<area href="classm5_1_1unit_1_1_interface_g_p_i_o.html" alt="m5::unit::InterfaceGPIO" shape="rect" coords="0,56,200,80"/>
+<area href="classm5_1_1unit_1_1_interface_i2_c.html" alt="m5::unit::InterfaceI2C" shape="rect" coords="210,56,410,80"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ac115081a9e9d44c9e6cef8002485265a" id="r_ac115081a9e9d44c9e6cef8002485265a"><td class="memItemLeft" align="right" valign="top"><a id="ac115081a9e9d44c9e6cef8002485265a" name="ac115081a9e9d44c9e6cef8002485265a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Interface</b> (<a class="el" href="classm5_1_1unit_1_1_unit_r_c_w_l9620.html">UnitRCWL9620</a> &amp;u)</td></tr>
+<tr class="separator:ac115081a9e9d44c9e6cef8002485265a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f0b2f812af9cbe45e0d70d166ff298c" id="r_a8f0b2f812af9cbe45e0d70d166ff298c"><td class="memItemLeft" align="right" valign="top"><a id="a8f0b2f812af9cbe45e0d70d166ff298c" name="a8f0b2f812af9cbe45e0d70d166ff298c"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>read_measurement</b> (<a class="el" href="structm5_1_1unit_1_1rcwl9620_1_1_data.html">rcwl9620::Data</a> &amp;, bool &amp;)=0</td></tr>
+<tr class="separator:a8f0b2f812af9cbe45e0d70d166ff298c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0756448d2f3a1b8d07198721b5580559" id="r_a0756448d2f3a1b8d07198721b5580559"><td class="memItemLeft" align="right" valign="top"><a id="a0756448d2f3a1b8d07198721b5580559" name="a0756448d2f3a1b8d07198721b5580559"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>request_measurement</b> ()=0</td></tr>
+<tr class="separator:a0756448d2f3a1b8d07198721b5580559"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
-Namespaces</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacem5.html">m5</a></td></tr>
-<tr class="memdesc:namespacem5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Top level namespace of M5stack. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:acd96abc5db4981241af0b933c1d199da" id="r_acd96abc5db4981241af0b933c1d199da"><td class="memItemLeft" align="right" valign="top"><a id="acd96abc5db4981241af0b933c1d199da" name="acd96abc5db4981241af0b933c1d199da"></a>
+<a class="el" href="classm5_1_1unit_1_1_unit_r_c_w_l9620.html">UnitRCWL9620</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>_unit</b></td></tr>
+<tr class="separator:acd96abc5db4981241af0b933c1d199da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>RCWL9620 Unit for M5UnitUnified. </p>
+<div class="textblock"><p>@cond0 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_b9225a18e54a15d8544a67849bf5de50.html">unit</a></li><li class="navelem"><a class="el" href="unit___r_c_w_l9620_8cpp.html">unit_RCWL9620.cpp</a></li>
+    <li class="navelem"><a class="el" href="namespacem5.html">m5</a></li><li class="navelem"><b>unit</b></li><li class="navelem"><a class="el" href="classm5_1_1unit_1_1_unit_r_c_w_l9620.html">UnitRCWL9620</a></li><li class="navelem"><a class="el" href="classm5_1_1unit_1_1_unit_r_c_w_l9620_1_1_interface.html">Interface</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.11.0 </li>
   </ul>
 </div>

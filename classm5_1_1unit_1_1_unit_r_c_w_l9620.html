@@ -27,7 +27,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">M5Unit-DISTANCE<span id="projectnumber">&#160;0.1.0 git rev:cb3063c</span>
+   <div id="projectname">M5Unit-DISTANCE<span id="projectnumber">&#160;0.2.0 git rev:2044122</span>
    </div>
   </td>
  </tr>
@@ -100,6 +100,7 @@ $(function(){initNavTree('classm5_1_1unit_1_1_unit_r_c_w_l9620.html',''); initRe
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classm5_1_1unit_1_1_unit_r_c_w_l9620-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">m5::unit::UnitRCWL9620 Class Reference</div></div>
 </div><!--header-->
@@ -113,13 +114,20 @@ $(function(){initNavTree('classm5_1_1unit_1_1_unit_r_c_w_l9620.html',''); initRe
 Inheritance diagram for m5::unit::UnitRCWL9620:</div>
 <div class="dyncontent">
  <div class="center">
-  <img src="classm5_1_1unit_1_1_unit_r_c_w_l9620.png" alt=""/>
- </div></div>
+  <img src="classm5_1_1unit_1_1_unit_r_c_w_l9620.png" usemap="#m5::unit::UnitRCWL9620_map" alt=""/>
+  <map id="m5::unit::UnitRCWL9620_map" name="m5::unit::UnitRCWL9620_map">
+<area href="classm5_1_1unit_1_1_unit_ultra_sonic_i2_c.html" title="An ultrasonic distance measuring sensor unit for I2C." alt="m5::unit::UnitUltraSonicI2C" shape="rect" coords="0,112,381,136"/>
+<area href="classm5_1_1unit_1_1_unit_ultra_sonic_i_o.html" title="An ultrasonic distance measuring sensor unit for GPIO." alt="m5::unit::UnitUltraSonicIO" shape="rect" coords="391,112,772,136"/>
+  </map>
+</div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structm5_1_1unit_1_1_unit_r_c_w_l9620_1_1config__t.html">config_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Settings for begin.  <a href="structm5_1_1unit_1_1_unit_r_c_w_l9620_1_1config__t.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classm5_1_1unit_1_1_unit_r_c_w_l9620_1_1_interface.html">Interface</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">@cond0  <a href="classm5_1_1unit_1_1_unit_r_c_w_l9620_1_1_interface.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -164,18 +172,30 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a18a50f5e9f56b35e367d78f218464605" id="r_a18a50f5e9f56b35e367d78f218464605"><td class="memItemLeft" align="right" valign="top"><a id="a18a50f5e9f56b35e367d78f218464605" name="a18a50f5e9f56b35e367d78f218464605"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>request_measurement</b> ()</td></tr>
 <tr class="separator:a18a50f5e9f56b35e367d78f218464605"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c01badcfb38a2fd1030b040f904c85a" id="r_a6c01badcfb38a2fd1030b040f904c85a"><td class="memItemLeft" align="right" valign="top"><a id="a6c01badcfb38a2fd1030b040f904c85a" name="a6c01badcfb38a2fd1030b040f904c85a"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>read_measurement</b> (<a class="el" href="structm5_1_1unit_1_1rcwl9620_1_1_data.html">rcwl9620::Data</a> &amp;d)</td></tr>
-<tr class="separator:a6c01badcfb38a2fd1030b040f904c85a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acaca9b40e6a06e8f80294e03230991ca" id="r_acaca9b40e6a06e8f80294e03230991ca"><td class="memItemLeft" align="right" valign="top"><a id="acaca9b40e6a06e8f80294e03230991ca" name="acaca9b40e6a06e8f80294e03230991ca"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>read_measurement</b> (<a class="el" href="structm5_1_1unit_1_1rcwl9620_1_1_data.html">rcwl9620::Data</a> &amp;d, bool &amp;timeouted)</td></tr>
+<tr class="separator:acaca9b40e6a06e8f80294e03230991ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c1b4a2e197d499b7007f2badaf22005" id="r_a7c1b4a2e197d499b7007f2badaf22005"><td class="memItemLeft" align="right" valign="top"><a id="a7c1b4a2e197d499b7007f2badaf22005" name="a7c1b4a2e197d499b7007f2badaf22005"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>start_periodic_measurement</b> (const uint32_t interval)</td></tr>
 <tr class="separator:a7c1b4a2e197d499b7007f2badaf22005"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9767788746f78cf816e5a4640dbbed1" id="r_ae9767788746f78cf816e5a4640dbbed1"><td class="memItemLeft" align="right" valign="top"><a id="ae9767788746f78cf816e5a4640dbbed1" name="ae9767788746f78cf816e5a4640dbbed1"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>stop_periodic_measurement</b> ()</td></tr>
 <tr class="separator:ae9767788746f78cf816e5a4640dbbed1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade1517d60d0c938a1cd97775b274db9c" id="r_ade1517d60d0c938a1cd97775b274db9c"><td class="memItemLeft" align="right" valign="top"><a id="ade1517d60d0c938a1cd97775b274db9c" name="ade1517d60d0c938a1cd97775b274db9c"></a>
+<a class="el" href="classm5_1_1unit_1_1_unit_r_c_w_l9620_1_1_interface.html">Interface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>interface</b> ()</td></tr>
+<tr class="separator:ade1517d60d0c938a1cd97775b274db9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4968a910bed1559a47e6deb9f83f22a" id="r_aa4968a910bed1559a47e6deb9f83f22a"><td class="memItemLeft" align="right" valign="top"><a id="aa4968a910bed1559a47e6deb9f83f22a" name="aa4968a910bed1559a47e6deb9f83f22a"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>M5_UNIT_COMPONENT_PERIODIC_MEASUREMENT_ADAPTER_HPP_BUILDER</b> (<a class="el" href="classm5_1_1unit_1_1_unit_r_c_w_l9620.html">UnitRCWL9620</a>, <a class="el" href="structm5_1_1unit_1_1rcwl9620_1_1_data.html">rcwl9620::Data</a>)</td></tr>
 <tr class="separator:aa4968a910bed1559a47e6deb9f83f22a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6ce424621bc0599d428d4d8ceaf4f6b" id="r_ae6ce424621bc0599d428d4d8ceaf4f6b"><td class="memItemLeft" align="right" valign="top"><a id="ae6ce424621bc0599d428d4d8ceaf4f6b" name="ae6ce424621bc0599d428d4d8ceaf4f6b"></a>
+virtual uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>minimum_interval</b> () const</td></tr>
+<tr class="separator:ae6ce424621bc0599d428d4d8ceaf4f6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a00bf192cdba9d4a72fb950dee69cd92d" id="r_a00bf192cdba9d4a72fb950dee69cd92d"><td class="memItemLeft" align="right" valign="top"><a id="a00bf192cdba9d4a72fb950dee69cd92d" name="a00bf192cdba9d4a72fb950dee69cd92d"></a>
+std::unique_ptr&lt; m5::container::CircularBuffer&lt; <a class="el" href="structm5_1_1unit_1_1rcwl9620_1_1_data.html">rcwl9620::Data</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_data</b> {}</td></tr>
+<tr class="separator:a00bf192cdba9d4a72fb950dee69cd92d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An ultrasonic distance measuring sensor unit. </p>
@@ -239,7 +259,6 @@ Blocked until measurement is complete </dd></dl>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Interval must be at least 150 ms </dd></dl>
 
 </div>
 </div>

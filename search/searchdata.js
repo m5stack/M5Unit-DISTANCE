@@ -1,7 +1,7 @@
 var indexSectionsWithContent =
 {
   0: "cdimrsu",
-  1: "cdu",
+  1: "cdiu",
   2: "mru",
   3: "mu",
   4: "cdms",
