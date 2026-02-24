@@ -12,7 +12,7 @@
 #include <M5UnitUnified.hpp>
 #include <googletest/test_template.hpp>
 #include <googletest/test_helper.hpp>
-#include <unit/unit_RCWL9620.hpp>
+#include <unit/unit_UltraSonic.hpp>
 #include <cmath>
 #include <random>
 
@@ -25,16 +25,14 @@ const ::testing::Environment* global_fixture = ::testing::AddGlobalTestEnvironme
 
 constexpr uint32_t STORED_SIZE{8};
 
-class TestRCWL9620 : public ComponentTestBase<UnitRCWL9620, bool> {
+class TestRCWL9620 : public ComponentTestBase<UnitUltraSonicI2C, bool> {
 protected:
-    virtual UnitRCWL9620* get_instance() override
+    virtual UnitUltraSonicI2C* get_instance() override
     {
-        auto ptr         = new m5::unit::UnitRCWL9620();
+        auto ptr         = new m5::unit::UnitUltraSonicI2C();
         auto ccfg        = ptr->component_config();
         ccfg.stored_size = STORED_SIZE;
         ptr->component_config(ccfg);
-        return ptr;
-
         return ptr;
     }
     virtual bool is_using_hal() const override

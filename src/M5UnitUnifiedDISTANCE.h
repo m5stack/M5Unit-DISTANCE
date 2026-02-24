@@ -5,7 +5,7 @@
  */
 /*!
   @file M5UnitUnifiedDISTANCE.h
-  @brief Main header of M5UnitDISTANCE using M5UnitUnfied
+  @brief Main header of M5UnitDISTANCE using M5UnitUnified
 */
 #ifndef M5_UNIT_UNIFIED_DISTANCE_H
 #define M5_UNIT_UNIFIED_DISTANCE_H

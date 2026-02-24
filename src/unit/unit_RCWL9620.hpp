@@ -52,6 +52,8 @@ struct Data {
 /*!
   @class m5::unit::UnitRCWL9620
   @brief An ultrasonic distance measuring sensor unit
+  @note The RCWL-9620 may occasionally time out during I2C reads, depending on the core (a sensor
+  hardware characteristic). The library automatically recovers on the next measurement cycle.
 */
 class UnitRCWL9620 : public Component, public PeriodicMeasurementAdapter<UnitRCWL9620, rcwl9620::Data> {
     M5_UNIT_COMPONENT_HPP_BUILDER(UnitRCWL9620, 0x57);
@@ -64,8 +66,8 @@ public:
     struct config_t {
         //! Start periodic measurement on begin?
         bool start_periodic{true};
-        //! Interval time if start on begin (ms) (100-)
-        uint32_t interval_ms{250};
+        //! Interval time if start on begin (ms) (I2C:150-, GPIO:50-)
+        uint32_t interval_ms{150};
     };
 
     explicit UnitRCWL9620(const uint8_t addr = DEFAULT_ADDRESS)
@@ -84,12 +86,12 @@ public:
 
     ///@name Settings for begin
     ///@{
-    /*! @brief Gets the configration */
+    /*! @brief Gets the configuration */
     inline config_t config()
     {
         return _cfg;
     }
-    //! @brief Set the configration
+    //! @brief Set the configuration
     inline void config(const config_t& cfg)
     {
         _cfg = cfg;
@@ -130,7 +132,7 @@ public:
     ///@{
     /*!
       @brief Measurement single shot
-      @param[out] data Measuerd data
+      @param[out] data Measured data
       @warning During periodic detection runs, an error is returned
       @warning Blocked until measurement is complete
     */

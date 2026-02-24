@@ -35,14 +35,12 @@ public:
     {
         timeouted = false;
         std::fill(d.raw.begin(), d.raw.end(), 0x00);
-        uint32_t cnt{4};
-        do {
-            if (_unit.readWithTransaction(d.raw.data(), d.raw.size()) == m5::hal::error::error_t::OK) {
-                _requested = false;
-                return true;
-            }
-            timeouted = true;
-        } while (cnt--);
+        if (_unit.readWithTransaction(d.raw.data(), d.raw.size()) == m5::hal::error::error_t::OK) {
+            _requested = false;
+            return true;
+        }
+        timeouted  = true;
+        _requested = false;
         return false;
     }
     inline virtual bool request_measurement() override
@@ -69,23 +67,25 @@ public:
     }
     virtual bool read_measurement(Data& d, bool& timeouted) override
     {
+        timeouted = false;
         std::fill(d.raw.begin(), d.raw.end(), 0x00);
 
         // Request
         _unit.writeDigitalTX(LOW);
         m5::utility::delayMicroseconds(2);
         _unit.writeDigitalTX(HIGH);
-        m5::utility::delayMicroseconds(10);
+        m5::utility::delayMicroseconds(20);
         _unit.writeDigitalTX(LOW);
 
         // Read
+        // @note Speed of sound is fixed at 343 m/s (approx. 20 deg C).
+        // No temperature compensation; error up to +/-7% over 0-40 deg C range.
         uint32_t duration{};
         if (!_unit.pulseInRX(duration, HIGH, 50000)) {
             return false;
         }
 
-        const uint32_t distance_mm = static_cast<uint32_t>(duration * 0.343f / 2.0f);
-        const uint32_t distance_um = static_cast<uint32_t>(distance_mm * 1000.0f);
+        const uint32_t distance_um = static_cast<uint32_t>(duration * 0.343f / 2.0f * 1000.0f);
         d.raw[0]                   = (distance_um >> 16) & 0xFF;
         d.raw[1]                   = (distance_um >> 8) & 0xFF;
         d.raw[2]                   = distance_um & 0xFF;
@@ -132,7 +132,22 @@ bool UnitRCWL9620::begin()
         return false;
     }
 
-    return _cfg.start_periodic ? startPeriodicMeasurement(_cfg.interval_ms) : true;
+    // Verify sensor communication by performing a test measurement
+    // (sensor may still be busy after MCU software reset)
+    for (uint8_t retry = 0; retry < 8; ++retry) {
+        Data d{};
+        bool timeouted{};
+        if (request_measurement()) {
+            m5::utility::delay(minimum_interval());
+            if (read_measurement(d, timeouted) && !timeouted) {
+                return _cfg.start_periodic ? startPeriodicMeasurement(_cfg.interval_ms) : true;
+            }
+        }
+        M5_LIB_LOGD("Sensor not ready, retry %u", retry);
+        m5::utility::delay(100);
+    }
+    M5_LIB_LOGE("Sensor not responding");
+    return false;
 }
 
 void UnitRCWL9620::update(const bool force)
@@ -144,18 +159,16 @@ void UnitRCWL9620::update(const bool force)
             bool timeouted{};
             Data d{};
             _updated = read_measurement(d, timeouted);
-            if (_updated) {
-                // Data is invalid after Timeout has occurred
-                if (!timeouted) {
-                    _data->push_back(d);
-                }
-                if (!request_measurement()) {
-                    _periodic = false;
-                    M5_LIB_LOGE("Periodic measurements have been suspended");
-                    return;
-                }
-                _latest = m5::utility::millis();
+            if (_updated && !timeouted) {
+                _data->push_back(d);
             }
+            // Re-request for next measurement regardless of read result
+            if (!request_measurement()) {
+                _periodic = false;
+                M5_LIB_LOGE("Periodic measurements have been suspended");
+                return;
+            }
+            _latest = m5::utility::millis();
         }
     }
 }
@@ -167,10 +180,14 @@ bool UnitRCWL9620::measureSingleshot(rcwl9620::Data& d)
         return false;
     }
 
-    bool timeouted{};
-    if (request_measurement()) {
-        m5::utility::delay(100);
-        return read_measurement(d, timeouted) && !timeouted;
+    for (uint8_t retry = 0; retry < 3; ++retry) {
+        bool timeouted{};
+        if (request_measurement()) {
+            m5::utility::delay(minimum_interval());
+            if (read_measurement(d, timeouted) && !timeouted) {
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -222,8 +239,6 @@ bool UnitRCWL9620::stop_periodic_measurement()
 
 bool UnitRCWL9620::request_measurement()
 {
-    // Only write command
-    //    return writeRegister(MEASURE_DISTANCE, nullptr, 0);
     return _interface->request_measurement();
 }
 
