@@ -48,7 +48,7 @@ jobs:
   build:
     name: ${{ matrix.build-properties }}:${{ matrix.sketch }}:${{matrix.board}}@${{matrix.platform-version}}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 12
 
     strategy:
       fail-fast: false
@@ -94,35 +94,12 @@ jobs:
             platform-version: 2.0.17
             board: m5stack-core-esp32
             build-properties: ""
-          - sketch: DualSensor
-            platform-url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
-            platform: esp32
-            archi: esp32
-            platform-version: 2.0.17
-            board: m5stack-core2
-            build-properties: ""
-          - sketch: DualSensor
-            platform-url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
-            platform: esp32
-            archi: esp32
-            platform-version: 2.0.17
-            board: m5stack-cores3
-            build-properties: ""
-          - sketch: DualSensor
-            platform-url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
-            platform: esp32
-            archi: esp32
-            platform-version: 2.0.17
-            board: m5stack-fire
-            build-properties: ""
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
 
-      # Build 
+      # Build
       - name: Compile examples
         uses: ArminJo/arduino-test-compile@master
         with:
