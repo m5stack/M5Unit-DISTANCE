@@ -22,7 +22,7 @@ Unit Ultrasonic-IO is a GPIO interface ultrasonic distance measurement sensor. T
 ## Related Link
 See also examples using conventional methods here.
 
-- [Unit Ultrasonic-I2C & Datasheet](https://docs.m5stack.com/ja/unit/ULTRASONIC%20I2C)
+- [Unit Ultrasonic-I2C & Datasheet](https://docs.m5stack.com/en/unit/ULTRASONIC%20I2C)
 - [Unit Ultrasonic-IO & Datasheet](https://docs.m5stack.com/en/unit/UNIT%20SONIC%20IO)
 
 ### Required Libraries:
