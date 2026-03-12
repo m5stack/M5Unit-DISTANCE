@@ -11,7 +11,6 @@
 #include <M5UnitUnified.h>
 #include <M5UnitUnifiedDISTANCE.h>
 #include <M5Utility.h>
-#include <M5HAL.hpp>  // For NessoN1
 
 namespace {
 auto& lcd = M5.Display;
@@ -67,23 +66,30 @@ void setup()
     auto board = M5.getBoard();
 
     M5_LOGI("getPin: SDA:%d SCL:%d GPIO:%d %d", pin_num_sda, pin_num_scl, pin_num_gpio_in, pin_num_gpio_out);
-    if (pin_num_sda < 0 || pin_num_scl < 0 || pin_num_gpio_in < 0 || pin_num_gpio_out < 0) {
-        M5_LOGE("Not enough pin settings");
-        lcd.clear(TFT_RED);
+    if (pin_num_gpio_in < 0 || pin_num_gpio_out < 0) {
+        M5_LOGE("PortB not available — DualSensor requires both PortA (I2C) and PortB (GPIO)");
+        lcd.fillScreen(TFT_RED);
         while (true) {
             m5::utility::delay(10000);
         }
     }
 
-    // Using TwoWire
-    M5_LOGI("getPin: SDA:%u SCL:%u", pin_num_sda, pin_num_scl);
-    Wire.end();
-    Wire.begin(pin_num_sda, pin_num_scl, 100 * 1000U);
-    if (!Units.add(unitI2C, Wire) ||                              // I2C
-        !Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) ||  // GPIO
-        !Units.begin()) {
+    // NessoN1: I2C sensor on QWIIC (port_a) via In_I2C, GPIO sensor on GROVE (port_b)
+    //   Wire (I2C_NUM_0) is used by M5Unified In_I2C — use In_I2C directly.
+    bool unit_ready{};
+    if (board == m5::board_t::board_ArduinoNessoN1) {
+        M5_LOGI("Using M5.In_I2C");
+        unit_ready = Units.add(unitI2C, M5.In_I2C) &&
+                     Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) && Units.begin();
+    } else {
+        M5_LOGI("getPin: SDA:%u SCL:%u", pin_num_sda, pin_num_scl);
+        Wire.end();
+        Wire.begin(pin_num_sda, pin_num_scl, 100 * 1000U);
+        unit_ready = Units.add(unitI2C, Wire) && Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) && Units.begin();
+    }
+    if (!unit_ready) {
         M5_LOGE("Failed to begin");
-        lcd.clear(TFT_RED);
+        lcd.fillScreen(TFT_RED);
         while (true) {
             m5::utility::delay(10000);
         }
@@ -118,7 +124,7 @@ void setup()
         }
 
         lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-        lcd.clear(TFT_BLACK);
+        lcd.fillScreen(TFT_BLACK);
 
         // Draw static labels and separator
         lcd.startWrite();
