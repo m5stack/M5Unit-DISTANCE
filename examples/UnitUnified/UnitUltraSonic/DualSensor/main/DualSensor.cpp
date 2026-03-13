@@ -79,8 +79,8 @@ void setup()
     bool unit_ready{};
     if (board == m5::board_t::board_ArduinoNessoN1) {
         M5_LOGI("Using M5.In_I2C");
-        unit_ready = Units.add(unitI2C, M5.In_I2C) &&
-                     Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) && Units.begin();
+        unit_ready =
+            Units.add(unitI2C, M5.In_I2C) && Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) && Units.begin();
     } else {
         M5_LOGI("getPin: SDA:%u SCL:%u", pin_num_sda, pin_num_scl);
         Wire.end();
