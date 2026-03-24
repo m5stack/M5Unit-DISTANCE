@@ -30,20 +30,24 @@ namespace rcwl9620 {
   @brief Measurement data group
  */
 struct Data {
-    std::array<uint8_t, 3> raw{};  // Raw data
+    std::array<uint8_t, 3> raw{};  //!< Raw data (3 bytes, MSB first)
 
-    static constexpr float MAX_DISTANCE{4500.f};
-    static constexpr float MIN_DISTANCE{20.f};
+    static constexpr float MAX_DISTANCE{4500.f};  //!< Maximum distance (mm)
+    static constexpr float MIN_DISTANCE{20.f};    //!< Minimum distance (mm)
 
-    //! Get distance(mm)
+    //! @brief Get distance (mm)
+    //! @return Distance clamped to [MIN_DISTANCE, MAX_DISTANCE]
     inline float distance() const
     {
         float fd = raw_distance() / 1000.f;
         return std::fmax(std::fmin(fd, MAX_DISTANCE), MIN_DISTANCE);
     }
+    //! @brief Get raw distance (um)
+    //! @return Raw distance in micrometres
     inline uint32_t raw_distance() const
     {
-        return ((uint32_t)raw[0] << 16) | ((uint32_t)raw[1] << 8) | (uint32_t)raw[2];
+        return (static_cast<uint32_t>(raw[0]) << 16) | (static_cast<uint32_t>(raw[1]) << 8) |
+               static_cast<uint32_t>(raw[2]);
     }
 };
 
@@ -70,6 +74,8 @@ public:
         uint32_t interval_ms{150};
     };
 
+    //! @brief Constructor
+    //! @param addr I2C address (default: 0x57)
     explicit UnitRCWL9620(const uint8_t addr = DEFAULT_ADDRESS)
         : Component(addr), _data{new m5::container::CircularBuffer<rcwl9620::Data>(1)}
     {
@@ -81,7 +87,11 @@ public:
     {
     }
 
+    //! @brief Begin communication and optionally start periodic measurement
+    //! @return True if successful
     virtual bool begin() override;
+    //! @brief Update periodic measurement
+    //! @param force Force read regardless of timing
     virtual void update(const bool force = false) override;
 
     ///@name Settings for begin
@@ -133,10 +143,11 @@ public:
     /*!
       @brief Measurement single shot
       @param[out] data Measured data
+      @return True if successful
       @warning During periodic detection runs, an error is returned
       @warning Blocked until measurement is complete
     */
-    bool measureSingleshot(rcwl9620::Data& d);
+    bool measureSingleshot(rcwl9620::Data& data);
     ///@}
 
     ///@cond0

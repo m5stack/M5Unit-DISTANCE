@@ -23,9 +23,12 @@ class UnitUltraSonicI2C : public UnitRCWL9620 {
     M5_UNIT_COMPONENT_HPP_BUILDER(UnitUltraSonicI2C, 0x57);
 
 public:
+    //! @brief Constructor
     explicit UnitUltraSonicI2C() : UnitRCWL9620(DEFAULT_ADDRESS)
     {
     }
+    //! @brief Begin I2C communication
+    //! @return True if successful
     virtual bool begin() override;
 };
 
@@ -37,9 +40,12 @@ class UnitUltraSonicIO : public UnitRCWL9620 {
     M5_UNIT_COMPONENT_HPP_BUILDER(UnitUltraSonicIO, 0x00);
 
 public:
+    //! @brief Constructor
     explicit UnitUltraSonicIO() : UnitRCWL9620(DEFAULT_ADDRESS)
     {
     }
+    //! @brief Begin GPIO communication
+    //! @return True if successful
     virtual bool begin() override;
 
 protected:

@@ -173,7 +173,7 @@ void UnitRCWL9620::update(const bool force)
     }
 }
 
-bool UnitRCWL9620::measureSingleshot(rcwl9620::Data& d)
+bool UnitRCWL9620::measureSingleshot(rcwl9620::Data& data)
 {
     if (inPeriodic()) {
         M5_LIB_LOGD("Periodic measurements are running");
@@ -184,7 +184,7 @@ bool UnitRCWL9620::measureSingleshot(rcwl9620::Data& d)
         bool timeouted{};
         if (request_measurement()) {
             m5::utility::delay(minimum_interval());
-            if (read_measurement(d, timeouted) && !timeouted) {
+            if (read_measurement(data, timeouted) && !timeouted) {
                 return true;
             }
         }
