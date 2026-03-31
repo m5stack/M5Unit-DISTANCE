@@ -96,12 +96,14 @@ public:
 
     ///@name Settings for begin
     ///@{
-    /*! @brief Gets the configuration */
+    /*! @brief Gets the configuration
+      @return Copy of current configuration */
     inline config_t config()
     {
         return _cfg;
     }
     //! @brief Set the configuration
+    //! @param cfg Configuration to apply at next begin()
     inline void config(const config_t& cfg)
     {
         _cfg = cfg;
@@ -111,6 +113,7 @@ public:
     ///@name Measurement data by periodic
     ///@{
     //! @brief Oldest distance (mm)
+    //! @return Distance in mm, or NaN if no data available
     float distance() const
     {
         return !empty() ? oldest().distance() : std::numeric_limits<float>::quiet_NaN();
@@ -121,7 +124,7 @@ public:
     ///@{
     /*!
       @brief Start periodic measurement
-      @param interval Measurement interval (ms)
+      @param interval Measurement interval (ms). Minimum: 150ms for I2C, 50ms for GPIO
       @return True if successful
     */
     inline bool startPeriodicMeasurement(const uint32_t interval)

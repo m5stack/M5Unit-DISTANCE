@@ -10,7 +10,9 @@
 // Choose connection
 // *********************************************************************
 #if !defined(CONNECT_VIA_I2C) && !defined(CONNECT_VIA_GPIO)
+// UnitUltraSonicI2C (SKU:U098-B1)
 // #define CONNECT_VIA_I2C
+// UnitUltraSonicIO  (SKU:U098-B2)
 // #define CONNECT_VIA_GPIO
 #endif
 #include "main/PlotToSerial.cpp"

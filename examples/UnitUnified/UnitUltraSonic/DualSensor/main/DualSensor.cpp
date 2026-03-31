@@ -82,7 +82,7 @@ void setup()
         unit_ready =
             Units.add(unitI2C, M5.In_I2C) && Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) && Units.begin();
     } else {
-        M5_LOGI("getPin: SDA:%u SCL:%u", pin_num_sda, pin_num_scl);
+        M5_LOGI("getPin: SDA:%d SCL:%d", pin_num_sda, pin_num_scl);
         Wire.end();
         Wire.begin(pin_num_sda, pin_num_scl, 100 * 1000U);
         unit_ready = Units.add(unitI2C, Wire) && Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) && Units.begin();

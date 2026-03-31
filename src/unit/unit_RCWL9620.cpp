@@ -128,7 +128,7 @@ bool UnitRCWL9620::begin()
             break;
     }
     if (!_interface) {
-        M5_LIB_LOGE("Invalid adapter %u", atype);
+        M5_LIB_LOGE("Invalid adapter %u", static_cast<unsigned>(atype));
         return false;
     }
 
