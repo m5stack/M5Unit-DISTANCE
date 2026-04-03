@@ -4,6 +4,6 @@
  * SPDX-License-Identifier: MIT
  */
 /*
-  Example using SonicI2C and SonicIO
+  Example using UltraSonicI2C and UltraSonicIO
 */
 #include "main/DualSensor.cpp"

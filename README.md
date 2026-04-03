@@ -7,7 +7,7 @@ M5UnitUnified is a library for unified handling of various M5 units products.
 
 ### SKU:U098-B1
 
-UNIT SONIC I2C is an I2C interface ultrasonic distance sensor. This allows for easy I2C integration and multi-sensor operation using a single BUS, to save I/O resources. The module features an RCWL-9620 ultrasonic distance measurement chip with a 16mm probe, which the ranging accuracy can reach 2cm-450cm(accuracy up to ±2%). It is ideal to apply in robotics obstacle avoidance, fluid level detection, and other applications that require you to perform measurements.
+The Unit Ultrasonic-I2C is an ultrasonic distance measurement sensor with an I2C communication interface. The hardware utilizes the RCWL-9620 ultrasonic distance measurement chip paired with a 16mm probe, capable of achieving precise distance measurement within the range of 2cm-450cm (accuracy up to ±2%). As an I2C slave device, the sensor can share bus resources with other I2C devices, making it very suitable for multi-sensor applications such as robot obstacle avoidance, fluid level detection, and other scenarios requiring distance measurements.
 
 
 ### SKU:U098-B2
@@ -16,13 +16,13 @@ Unit Ultrasonic-IO is a GPIO interface ultrasonic distance measurement sensor. T
 
 
 ## Future Plans
-- Unit Ultrasonic(SKU:U098) will support soon.
+- Unit Ultrasonic(SKU:U098) will be supported soon.
 
 
 ## Related Link
 See also examples using conventional methods here.
 
-- [Unit Ultrasonic-I2C & Datasheet](https://docs.m5stack.com/ja/unit/ULTRASONIC%20I2C)
+- [Unit Ultrasonic-I2C & Datasheet](https://docs.m5stack.com/en/unit/ULTRASONIC%20I2C)
 - [Unit Ultrasonic-IO & Datasheet](https://docs.m5stack.com/en/unit/UNIT%20SONIC%20IO)
 
 ### Required Libraries:
@@ -46,6 +46,23 @@ See also [M5Unit-HUB](https://github.com/m5stack/M5Unit-HUB)
 
 ## Examples
 See also [examples/UnitUnified](examples/UnitUnified)
+
+### For ArduinoIDE settings
+You must choose a define symbol for the connection method you will use.
+(Rewrite source or specify with compile options)
+
+- PlotToSerial
+```cpp
+// *********************************************************************
+// Choose connection
+// *********************************************************************
+#if !defined(CONNECT_VIA_I2C) && !defined(CONNECT_VIA_GPIO)
+// UnitUltraSonicI2C (SKU:U098-B1)
+// #define CONNECT_VIA_I2C
+// UnitUltraSonicIO  (SKU:U098-B2)
+// #define CONNECT_VIA_GPIO
+#endif
+```
 
 ### Doxygen document
 [GitHub Pages](https://m5stack.github.io/M5Unit-DISTANCE/)

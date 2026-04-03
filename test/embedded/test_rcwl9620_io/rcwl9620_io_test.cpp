@@ -1,10 +1,10 @@
 /*
- * SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+ * SPDX-FileCopyrightText: 2025 M5Stack Technology CO LTD
  *
  * SPDX-License-Identifier: MIT
  */
 /*
-  UnitTest for UnitUltraSonicI2C (I2C variant)
+  UnitTest for UnitUltraSonicIO (GPIO variant)
 */
 #include <gtest/gtest.h>
 #include <Wire.h>
@@ -21,11 +21,11 @@ using namespace m5::unit::rcwl9620;
 
 constexpr uint32_t STORED_SIZE{8};
 
-class TestRCWL9620 : public I2CComponentTestBase<UnitUltraSonicI2C> {
+class TestRCWL9620_IO : public GPIOComponentTestBase<UnitUltraSonicIO> {
 protected:
-    virtual UnitUltraSonicI2C* get_instance() override
+    virtual UnitUltraSonicIO* get_instance() override
     {
-        auto ptr         = new m5::unit::UnitUltraSonicI2C();
+        auto ptr         = new m5::unit::UnitUltraSonicIO();
         auto ccfg        = ptr->component_config();
         ccfg.stored_size = STORED_SIZE;
         ptr->component_config(ccfg);
@@ -33,7 +33,7 @@ protected:
     }
 };
 
-#define RCWL9620_TEST_CLASS TestRCWL9620
-#define MIN_INTERVAL        150
-#define MEDIAN_TOLERANCE    1
+#define RCWL9620_TEST_CLASS TestRCWL9620_IO
+#define MIN_INTERVAL        50
+#define MEDIAN_TOLERANCE    50  // GPIO: pulseInRX takes up to 50ms per measurement
 #include "../rcwl9620_test.inl"

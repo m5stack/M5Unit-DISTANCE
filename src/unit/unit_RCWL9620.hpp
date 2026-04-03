@@ -30,20 +30,24 @@ namespace rcwl9620 {
   @brief Measurement data group
  */
 struct Data {
-    std::array<uint8_t, 3> raw{};  // Raw data
+    std::array<uint8_t, 3> raw{};  //!< Raw data (3 bytes, MSB first)
 
-    static constexpr float MAX_DISTANCE{4500.f};
-    static constexpr float MIN_DISTANCE{20.f};
+    static constexpr float MAX_DISTANCE{4500.f};  //!< Maximum distance (mm)
+    static constexpr float MIN_DISTANCE{20.f};    //!< Minimum distance (mm)
 
-    //! Get distance(mm)
+    //! @brief Get distance (mm)
+    //! @return Distance clamped to [MIN_DISTANCE, MAX_DISTANCE]
     inline float distance() const
     {
         float fd = raw_distance() / 1000.f;
         return std::fmax(std::fmin(fd, MAX_DISTANCE), MIN_DISTANCE);
     }
+    //! @brief Get raw distance (um)
+    //! @return Raw distance in micrometres
     inline uint32_t raw_distance() const
     {
-        return ((uint32_t)raw[0] << 16) | ((uint32_t)raw[1] << 8) | (uint32_t)raw[2];
+        return (static_cast<uint32_t>(raw[0]) << 16) | (static_cast<uint32_t>(raw[1]) << 8) |
+               static_cast<uint32_t>(raw[2]);
     }
 };
 
@@ -52,6 +56,8 @@ struct Data {
 /*!
   @class m5::unit::UnitRCWL9620
   @brief An ultrasonic distance measuring sensor unit
+  @note The RCWL-9620 may occasionally time out during I2C reads, depending on the core (a sensor
+  hardware characteristic). The library automatically recovers on the next measurement cycle.
 */
 class UnitRCWL9620 : public Component, public PeriodicMeasurementAdapter<UnitRCWL9620, rcwl9620::Data> {
     M5_UNIT_COMPONENT_HPP_BUILDER(UnitRCWL9620, 0x57);
@@ -64,10 +70,12 @@ public:
     struct config_t {
         //! Start periodic measurement on begin?
         bool start_periodic{true};
-        //! Interval time if start on begin (ms) (100-)
-        uint32_t interval_ms{250};
+        //! Interval time if start on begin (ms) (I2C:150-, GPIO:50-)
+        uint32_t interval_ms{150};
     };
 
+    //! @brief Constructor
+    //! @param addr I2C address (default: 0x57)
     explicit UnitRCWL9620(const uint8_t addr = DEFAULT_ADDRESS)
         : Component(addr), _data{new m5::container::CircularBuffer<rcwl9620::Data>(1)}
     {
@@ -79,17 +87,23 @@ public:
     {
     }
 
+    //! @brief Begin communication and optionally start periodic measurement
+    //! @return True if successful
     virtual bool begin() override;
+    //! @brief Update periodic measurement
+    //! @param force Force read regardless of timing
     virtual void update(const bool force = false) override;
 
     ///@name Settings for begin
     ///@{
-    /*! @brief Gets the configration */
+    /*! @brief Gets the configuration
+      @return Copy of current configuration */
     inline config_t config()
     {
         return _cfg;
     }
-    //! @brief Set the configration
+    //! @brief Set the configuration
+    //! @param cfg Configuration to apply at next begin()
     inline void config(const config_t& cfg)
     {
         _cfg = cfg;
@@ -99,6 +113,7 @@ public:
     ///@name Measurement data by periodic
     ///@{
     //! @brief Oldest distance (mm)
+    //! @return Distance in mm, or NaN if no data available
     float distance() const
     {
         return !empty() ? oldest().distance() : std::numeric_limits<float>::quiet_NaN();
@@ -109,7 +124,7 @@ public:
     ///@{
     /*!
       @brief Start periodic measurement
-      @param interval Measurement interval (ms)
+      @param interval Measurement interval (ms). Minimum: 150ms for I2C, 50ms for GPIO
       @return True if successful
     */
     inline bool startPeriodicMeasurement(const uint32_t interval)
@@ -130,11 +145,12 @@ public:
     ///@{
     /*!
       @brief Measurement single shot
-      @param[out] data Measuerd data
+      @param[out] data Measured data
+      @return True if successful
       @warning During periodic detection runs, an error is returned
       @warning Blocked until measurement is complete
     */
-    bool measureSingleshot(rcwl9620::Data& d);
+    bool measureSingleshot(rcwl9620::Data& data);
     ///@}
 
     ///@cond0
