@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['m5_0',['m5',['../namespacem5.html',1,'']]],
-  ['m5unit_20distance_1',['M5Unit-DISTANCE',['../index.html',1,'']]],
-  ['m5unitunifieddistance_2ehpp_2',['M5UnitUnifiedDISTANCE.hpp',['../_m5_unit_unified_d_i_s_t_a_n_c_e_8hpp.html',1,'']]],
-  ['measuresingleshot_3',['measureSingleshot',['../classm5_1_1unit_1_1_unit_r_c_w_l9620.html#a54b58414e175508a50c1832248908b15',1,'m5::unit::UnitRCWL9620']]]
+  ['interface_0',['Interface',['../classm5_1_1unit_1_1_unit_r_c_w_l9620_1_1_interface.html',1,'m5::unit::UnitRCWL9620']]],
+  ['interfacegpio_1',['InterfaceGPIO',['../classm5_1_1unit_1_1_interface_g_p_i_o.html',1,'m5::unit']]],
+  ['interfacei2c_2',['InterfaceI2C',['../classm5_1_1unit_1_1_interface_i2_c.html',1,'m5::unit']]],
+  ['interval_5fms_3',['interval_ms',['../structm5_1_1unit_1_1_unit_r_c_w_l9620_1_1config__t.html#a842a89db9c257a26616ee0e874fcd07b',1,'m5::unit::UnitRCWL9620::config_t']]]
 ];
