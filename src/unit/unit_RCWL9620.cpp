@@ -71,17 +71,17 @@ public:
         std::fill(d.raw.begin(), d.raw.end(), 0x00);
 
         // Request
-        _unit.writeDigitalTX(LOW);
+        _unit.writeDigitalTX(false);
         m5::utility::delayMicroseconds(2);
-        _unit.writeDigitalTX(HIGH);
+        _unit.writeDigitalTX(true);
         m5::utility::delayMicroseconds(20);
-        _unit.writeDigitalTX(LOW);
+        _unit.writeDigitalTX(false);
 
         // Read
         // @note Speed of sound is fixed at 343 m/s (approx. 20 deg C).
         // No temperature compensation; error up to +/-7% over 0-40 deg C range.
         uint32_t duration{};
-        if (!_unit.pulseInRX(duration, HIGH, 50000)) {
+        if (!_unit.pulseInRX(duration, 1 /* HIGH pulse */, 50000)) {
             return false;
         }
 
