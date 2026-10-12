@@ -11,6 +11,7 @@
 #include <M5UnitUnified.h>
 #include <M5UnitUnifiedDISTANCE.h>
 #include <M5Utility.h>
+#include <wiring/m5_unit_unified_wiring.hpp>  // Board-aware connection helpers (include last)
 
 namespace {
 auto& lcd = M5.Display;
@@ -58,41 +59,17 @@ void setup()
     }
 
     // PortA for I2C, PortB for GPIO
-    auto pin_num_sda      = M5.getPin(m5::pin_name_t::port_a_sda);
-    auto pin_num_scl      = M5.getPin(m5::pin_name_t::port_a_scl);
-    auto pin_num_gpio_in  = M5.getPin(m5::pin_name_t::port_b_in);
-    auto pin_num_gpio_out = M5.getPin(m5::pin_name_t::port_b_out);
-
-    auto board = M5.getBoard();
-
-    M5_LOGI("getPin: SDA:%d SCL:%d GPIO:%d %d", pin_num_sda, pin_num_scl, pin_num_gpio_in, pin_num_gpio_out);
-    if (pin_num_gpio_in < 0 || pin_num_gpio_out < 0) {
+    const auto gpio_pins = m5::unit::wiring::gpioPins();
+    if (gpio_pins.fallback_a) {
         M5_LOGE("PortB not available — DualSensor requires both PortA (I2C) and PortB (GPIO)");
-        lcd.fillScreen(TFT_RED);
-        while (true) {
-            m5::utility::delay(10000);
-        }
+        m5::unit::wiring::failStop();
     }
 
-    // NessoN1: I2C sensor on QWIIC (port_a) via In_I2C, GPIO sensor on GROVE (port_b)
-    //   Wire (I2C_NUM_0) is used by M5Unified In_I2C — use In_I2C directly.
-    bool unit_ready{};
-    if (board == m5::board_t::board_ArduinoNessoN1) {
-        M5_LOGI("Using M5.In_I2C");
-        unit_ready =
-            Units.add(unitI2C, M5.In_I2C) && Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) && Units.begin();
-    } else {
-        M5_LOGI("getPin: SDA:%d SCL:%d", pin_num_sda, pin_num_scl);
-        Wire.end();
-        Wire.begin(pin_num_sda, pin_num_scl, 100 * 1000U);
-        unit_ready = Units.add(unitI2C, Wire) && Units.add(unitIO, pin_num_gpio_in, pin_num_gpio_out) && Units.begin();
-    }
-    if (!unit_ready) {
+    // NessoN1: I2C sensor on QWIIC (PortA), GPIO sensor on GROVE (PortB)
+    if (!m5::unit::wiring::addI2C(Units, unitI2C, 0, m5::unit::wiring::NessoPort::PortA) ||
+        !m5::unit::wiring::addGPIO(Units, unitIO) || !Units.begin()) {
         M5_LOGE("Failed to begin");
-        lcd.fillScreen(TFT_RED);
-        while (true) {
-            m5::utility::delay(10000);
-        }
+        m5::unit::wiring::failStop();
     }
     M5_LOGI("M5UnitUnified has been begun");
     M5_LOGI("%s", Units.debugInfo().c_str());
