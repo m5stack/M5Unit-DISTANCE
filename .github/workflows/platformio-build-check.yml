@@ -102,6 +102,37 @@ jobs:
             board: Core
             framework: Arduino
             espressif32: latest
+          # ViaPaHub (UnitUltraSonicI2C through UnitPaHub): one board per chip
+          - example: ViaPaHub
+            unit: UnitUltraSonicI2C
+            board: Core
+            framework: Arduino
+            espressif32: latest
+          - example: ViaPaHub
+            unit: UnitUltraSonicI2C
+            board: CoreS3
+            framework: Arduino
+            espressif32: latest
+          - example: ViaPaHub
+            unit: UnitUltraSonicI2C
+            board: NanoC6
+            framework: Arduino
+            espressif32: latest
+          - example: ViaPaHub
+            unit: UnitUltraSonicI2C
+            board: NanoH2
+            framework: Arduino
+            espressif32: latest
+          - example: ViaPaHub
+            unit: UnitUltraSonicI2C
+            board: Tab5
+            framework: Arduino
+            espressif32: latest
+#          - example: ViaPaHub  # ESP32-C6: represented by NanoC6
+#            unit: UnitUltraSonicI2C
+#            board: NessoN1
+#            framework: Arduino
+#            espressif32: latest
 
     steps:
       - name: Checkout

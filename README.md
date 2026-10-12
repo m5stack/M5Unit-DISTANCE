@@ -37,11 +37,17 @@ See also examples using conventional methods here.
 
 ## Support via [PbHub](https://docs.m5stack.com/en/unit/pbhub_1.1)
 
-|Unit|Support|
-|---|---|
-|UnitUltraSonicIO|NG|
+|Unit|Support|Note|
+|---|---|---|
+|UnitUltraSonicIO|NG|Echo pulse-width measurement (µs timing) not supported by PbHub|
 
-See also [M5Unit-HUB](https://github.com/m5stack/M5Unit-HUB)
+## Support via [PaHub](https://docs.m5stack.com/en/unit/Unit-PaHub%20v2.1)
+
+|Unit|Support|Note|
+|---|---|---|
+|UnitUltraSonicI2C|OK||
+
+See also the [ViaPaHub](examples/UnitUnified/UnitUltraSonic/ViaPaHub) example and [M5Unit-HUB](https://github.com/m5stack/M5Unit-HUB)
 
 
 ## Examples
