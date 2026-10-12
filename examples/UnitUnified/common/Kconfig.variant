@@ -1,0 +1,19 @@
+# "Connection" selection for the UnitUltraSonic PlotToSerial example (ESP-IDF): UnitUltraSonicI2C
+# over I2C vs UnitUltraSonicIO over GPIO. PlotToSerial is the only example with a variant.
+# rsource'd from UnitUltraSonic/PlotToSerial/main/Kconfig.projbuild. The chosen CONFIG_EXAMPLE_CONNECT_VIA_*
+# is mapped to the source-level CONNECT_VIA_* macro in common/variant.cmake (shared with the Arduino build).
+menu "M5Unit-DISTANCE PlotToSerial example"
+
+choice EXAMPLE_DISTANCE_VARIANT
+    prompt "Connection"
+    default EXAMPLE_CONNECT_VIA_I2C
+    help
+        Which UnitUltraSonic connection this example drives.
+
+    config EXAMPLE_CONNECT_VIA_I2C
+        bool "UnitUltraSonicI2C (SKU:U098-B1, I2C / PortA)"
+    config EXAMPLE_CONNECT_VIA_GPIO
+        bool "UnitUltraSonicIO (SKU:U098-B2, GPIO / PortB)"
+endchoice
+
+endmenu
