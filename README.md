@@ -25,7 +25,7 @@ See also examples using conventional methods here.
 - [Unit Ultrasonic-I2C & Datasheet](https://docs.m5stack.com/en/unit/ULTRASONIC%20I2C)
 - [Unit Ultrasonic-IO & Datasheet](https://docs.m5stack.com/en/unit/UNIT%20SONIC%20IO)
 
-### Required Libraries:
+## Required Libraries:
 - [M5UnitUnified](https://github.com/m5stack/M5UnitUnified)
 - [M5Utility](https://github.com/m5stack/M5Utility)
 - [M5HAL](https://github.com/m5stack/M5HAL)
@@ -35,7 +35,7 @@ See also examples using conventional methods here.
 - [M5Unit-DISTANCE - MIT](LICENSE)
 
 
-### Support via [PbHub](https://docs.m5stack.com/en/unit/pbhub_1.1)
+## Support via [PbHub](https://docs.m5stack.com/en/unit/pbhub_1.1)
 
 |Unit|Support|
 |---|---|
@@ -64,7 +64,7 @@ You must choose a define symbol for the connection method you will use.
 #endif
 ```
 
-### Doxygen document
+## Doxygen document
 [GitHub Pages](https://m5stack.github.io/M5Unit-DISTANCE/)
 
 If you want to generate documents on your local machine, execute the following command
@@ -76,7 +76,7 @@ bash docs/doxy.sh
 It will output it under docs/html  
 If you want to output Git commit hashes to html, do it for the git cloned folder.
 
-#### Required
+### Required
 - [Doxygen](https://www.doxygen.nl/)
 - [pcregrep](https://formulae.brew.sh/formula/pcre2)
 - [Git](https://git-scm.com/) (Output commit hash to html)
