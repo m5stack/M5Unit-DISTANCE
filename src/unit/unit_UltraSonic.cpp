@@ -10,7 +10,6 @@
 #include "unit_UltraSonic.hpp"
 
 using namespace m5::utility::mmh3;
-using namespace m5::unit;
 using namespace m5::unit::types;
 
 namespace m5 {
@@ -37,7 +36,7 @@ const types::attr_t UnitUltraSonicIO::attr{attribute::AccessGPIO};
 
 bool UnitUltraSonicIO::begin()
 {
-    const types::uid_t pbhub_uid = "UnitPbHub"_mmh3;
+    const types::uid_t pbhub_uid{"UnitPbHub"_mmh3};
 
     if (adapter()->type() != Adapter::Type::GPIO) {
         M5_LIB_LOGE("Not GPIO connection");
