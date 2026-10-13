@@ -37,7 +37,7 @@ concurrency:
   cancel-in-progress: true
 
 # PlotToSerial has a Kconfig connection choice (common/Kconfig.variant): I2C (UnitUltraSonicI2C, default) or
-# GPIO (UnitUltraSonicIO). The matrix has the connection axis and the chip axis:
+# GPIO (UnitUltraSonicIO). The matrix has the connection, chip and idf axes:
 # esp32 = classic Xtensa dual-core, esp32s3 = LCD-capable dual-core Xtensa with PSRAM,
 # esp32c3 = RISC-V single-core (StampC3), esp32c6 (NanoC6) / esp32h2 (NanoH2) = RISC-V single-core which
 # exercises the app_main CONFIG_FREERTOS_UNICORE feedIdle branch, esp32c5 = RISC-V single-core supported from
