@@ -104,6 +104,11 @@ jobs:
             board: Core
             framework: Arduino
             espressif32: latest
+#          - example: DualSensor  # NessoN1: env for on-board checks only (QWIIC I2C + GROVE GPIO)
+#            unit: UnitUltraSonic
+#            board: NessoN1
+#            framework: Arduino
+#            espressif32: latest
           # ViaPaHub (UnitUltraSonicI2C through UnitPaHub): one board per chip
           - example: ViaPaHub
             unit: UnitUltraSonicI2C
