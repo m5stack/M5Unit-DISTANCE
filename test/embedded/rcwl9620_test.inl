@@ -24,13 +24,42 @@
 #endif
 // clang-format on
 
+TEST_F(RCWL9620_TEST_CLASS, BeginAppliesConfig)
+{
+    SCOPED_TRACE(ustr);
+
+    // begin() cannot start periodic measurement while it is already running
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+
+    auto cfg           = unit->config();
+    cfg.start_periodic = false;
+    unit->config(cfg);
+    EXPECT_TRUE(unit->begin());
+    EXPECT_FALSE(unit->inPeriodic());
+
+    cfg.start_periodic = true;
+    cfg.interval_ms    = MIN_INTERVAL + 50;
+    unit->config(cfg);
+    EXPECT_TRUE(unit->begin());
+    EXPECT_TRUE(unit->inPeriodic());
+    EXPECT_EQ(unit->interval(), MIN_INTERVAL + 50U);
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+
+    cfg.interval_ms = MIN_INTERVAL - 1;
+    unit->config(cfg);
+    EXPECT_FALSE(unit->begin());
+    EXPECT_FALSE(unit->inPeriodic());
+}
+
 TEST_F(RCWL9620_TEST_CLASS, Periodic)
 {
     SCOPED_TRACE(ustr);
 
     EXPECT_TRUE(unit->inPeriodic());
-    EXPECT_FALSE(unit->startPeriodicMeasurement(MIN_INTERVAL - 1));
+    EXPECT_FALSE(unit->startPeriodicMeasurement(MIN_INTERVAL));  // Already running
     EXPECT_TRUE(unit->stopPeriodicMeasurement());
+    EXPECT_FALSE(unit->inPeriodic());
+    EXPECT_FALSE(unit->startPeriodicMeasurement(MIN_INTERVAL - 1));  // Below the minimum interval
     EXPECT_FALSE(unit->inPeriodic());
 
     EXPECT_TRUE(unit->startPeriodicMeasurement(MIN_INTERVAL));
