@@ -15,12 +15,10 @@ using namespace m5::unit::types;
 using namespace m5::unit::rcwl9620;
 using namespace m5::unit::rcwl9620::command;
 
-namespace {
-}  // namespace
-
 namespace m5 {
 namespace unit {
 
+namespace {
 // Class that abstracts the interaction between classes and adapters
 // For I2C
 class InterfaceI2C : public UnitRCWL9620::Interface {
@@ -50,6 +48,8 @@ public:
         }
         return _requested;
     }
+
+private:
     bool _requested{};
 };
 
@@ -97,6 +97,7 @@ public:
         return true;
     }
 };
+}  // namespace
 
 // class UnitRCWL9620
 const char UnitRCWL9620::name[] = "UnitRCWL9620";
@@ -155,7 +156,7 @@ void UnitRCWL9620::update(const bool force)
     _updated = false;
     if (inPeriodic()) {
         elapsed_time_t at{m5::utility::millis()};
-        if (force || !_latest || at >= _latest + _interval) {
+        if (force || !_latest || m5::utility::hasElapsed(_latest, _interval, at)) {
             bool timeouted{};
             Data d{};
             _updated = read_measurement(d, timeouted);
@@ -216,12 +217,9 @@ bool UnitRCWL9620::stop_periodic_measurement()
 {
     if (inPeriodic()) {
         // Since the request has already been issued, the value should be retrieved
-        auto it  = interval();
-        auto dms = it - (m5::utility::millis() - updatedMillis());
-        if (dms > it) {
-            dms = it;
-        }
-        m5::utility::delay(dms);
+        const auto it      = interval();
+        const auto elapsed = m5::utility::elapsedSince(updatedMillis());
+        m5::utility::delay(elapsed >= it ? 0 : it - elapsed);
 
         uint32_t cnt{8};
         bool timeouted{};
