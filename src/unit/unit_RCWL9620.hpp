@@ -83,6 +83,7 @@ public:
         ccfg.clock = 100 * 1000U;
         component_config(ccfg);
     }
+    //! @brief Destructor
     virtual ~UnitRCWL9620()
     {
     }
