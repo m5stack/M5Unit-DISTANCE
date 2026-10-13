@@ -7,6 +7,8 @@
   Example using UltraSonicI2C and UltraSonicIO
   NOTICE: Core device needs PortA and PortB
 */
+#include <cinttypes>
+
 #include <M5Unified.h>
 #include <M5UnitUnified.h>
 #include <M5UnitUnifiedDISTANCE.h>
@@ -21,7 +23,7 @@ m5::unit::UnitUltraSonicIO unitIO;
 m5::unit::UnitRCWL9620* unit[2] = {&unitI2C, &unitIO};
 
 const char* type_table[]   = {"I2C", "GPIO"};
-const uint32_t bar_color[] = {TFT_CYAN, TFT_YELLOW};
+const uint16_t bar_color[] = {TFT_CYAN, TFT_YELLOW};
 
 bool use_lcd{};  // false if EPD or no display
 
@@ -71,7 +73,7 @@ void setup()
         M5_LOGE("Failed to begin");
         m5::unit::wiring::failStop();
     }
-    M5_LOGI("M5UnitUnified has been begun");
+    M5_LOGI("M5UnitUnified initialized");
     M5_LOGI("%s", Units.debugInfo().c_str());
 
     // Skip LCD drawing for EPD or no display
@@ -125,7 +127,7 @@ void loop()
         m5::unit::UnitRCWL9620* u = unit[i];
         if (u->updated()) {
             float dist = u->distance();
-            M5.Log.printf(">%s_Distance:%f\n>%s_Raw:%u\n", type_table[i], dist, type_table[i],
+            M5.Log.printf(">%s_Distance:%f\n>%s_Raw:%" PRIu32 "\n", type_table[i], dist, type_table[i],
                           u->oldest().raw_distance());
 
             if (use_lcd) {
