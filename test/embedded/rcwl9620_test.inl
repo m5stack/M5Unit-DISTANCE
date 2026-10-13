@@ -86,3 +86,20 @@ TEST_F(RCWL9620_TEST_CLASS, Singleshot)
         EXPECT_TRUE(std::isfinite(d.distance()));
     }
 }
+
+TEST_F(RCWL9620_TEST_CLASS, StopAfterInterval)
+{
+    SCOPED_TRACE(ustr);
+
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+
+    // Stopping after the interval has passed must not wait for another interval
+    constexpr uint32_t interval{MIN_INTERVAL * 4};
+    EXPECT_TRUE(unit->startPeriodicMeasurement(interval));
+    m5::utility::delay(interval * 2);
+
+    const auto start_at = m5::utility::millis();
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+    EXPECT_LT(m5::utility::elapsedSince(start_at), interval);
+    EXPECT_FALSE(unit->inPeriodic());
+}
