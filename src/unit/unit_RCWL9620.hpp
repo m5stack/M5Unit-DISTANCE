@@ -98,7 +98,7 @@ public:
     ///@{
     /*! @brief Gets the configuration
       @return Copy of current configuration */
-    inline config_t config()
+    inline config_t config() const
     {
         return _cfg;
     }
@@ -147,13 +147,13 @@ public:
       @brief Measurement single shot
       @param[out] data Measured data
       @return True if successful
-      @warning During periodic detection runs, an error is returned
+      @warning Returns false while periodic measurement is running
       @warning Blocked until measurement is complete
     */
     bool measureSingleshot(rcwl9620::Data& data);
     ///@}
 
-    ///@cond0
+    ///@cond
     // Class that abstracts the interaction between classes and adapters
     class Interface {
     public:
@@ -189,13 +189,8 @@ protected:
 
     inline virtual uint32_t minimum_interval() const
     {
-        // Datasheet says
-        // 向模块写入 0X01 ，模块开始测距；等待 100mS 模块最大测距时间
-        // Note : Max is assumed to be 50+100 since there is no description of Max.
-        // A larger value would be considered better?
-
-        // As a result of the experiment, it seems that in 100ms, 263 in requestFrom is returned in many cases.
-        // Therefore, the value should be increased.
+        // The datasheet gives 100 ms as the maximum ranging time after writing MEASURE_DISTANCE (0x01).
+        // Reading after 100 ms often fails with ESP_ERR_TIMEOUT (263), so 150 ms is used.
         return 150;  // for I2C
     }
 
@@ -204,7 +199,7 @@ private:
     config_t _cfg{};
 };
 
-///@cond 0
+///@cond
 namespace rcwl9620 {
 namespace command {
 constexpr uint8_t MEASURE_DISTANCE{0x01};
