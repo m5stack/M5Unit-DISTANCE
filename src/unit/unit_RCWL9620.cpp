@@ -169,7 +169,7 @@ void UnitRCWL9620::update(const bool force)
                 M5_LIB_LOGE("Periodic measurements have been suspended");
                 return;
             }
-            _latest = m5::utility::millis();
+            _latest = at;
         }
     }
 }
