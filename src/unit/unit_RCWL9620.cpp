@@ -19,6 +19,9 @@ namespace m5 {
 namespace unit {
 
 namespace {
+// Consecutive request failures that suspend periodic measurement
+constexpr uint8_t MAX_REQUEST_FAILURES{8};
+
 // Class that abstracts the interaction between classes and adapters
 // For I2C
 class InterfaceI2C : public UnitRCWL9620::Interface {
@@ -159,15 +162,21 @@ void UnitRCWL9620::update(const bool force)
         if (force || !_latest || m5::utility::hasElapsed(_latest, _interval, at)) {
             bool timeouted{};
             Data d{};
-            _updated = read_measurement(d, timeouted);
+            // Nothing to read when the previous request was not accepted
+            _updated = !_request_failures && read_measurement(d, timeouted);
             if (_updated && !timeouted) {
                 _data->push_back(d);
             }
             // Re-request for next measurement regardless of read result
-            if (!request_measurement()) {
+            if (request_measurement()) {
+                _request_failures = 0;
+            } else if (++_request_failures >= MAX_REQUEST_FAILURES) {
                 _periodic = false;
                 M5_LIB_LOGE("Periodic measurements have been suspended");
                 return;
+            } else {
+                M5_LIB_LOGW("Failed to request a measurement (%u), retry at the next interval",
+                            static_cast<unsigned>(_request_failures));
             }
             _latest = at;
         }
@@ -207,8 +216,9 @@ bool UnitRCWL9620::start_periodic_measurement(const uint32_t interval)
 
     _periodic = request_measurement();
     if (_periodic) {
-        _interval = interval;
-        _latest   = m5::utility::millis();
+        _request_failures = 0;
+        _interval         = interval;
+        _latest           = m5::utility::millis();
     }
     return _periodic;
 }

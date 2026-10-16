@@ -198,6 +198,7 @@ protected:
 private:
     std::unique_ptr<Interface> _interface{};
     config_t _cfg{};
+    uint8_t _request_failures{};  // Consecutive failures to request the next periodic measurement
 };
 
 ///@cond
