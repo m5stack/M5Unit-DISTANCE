@@ -80,7 +80,7 @@ public:
         : Component(addr), _data{new m5::container::CircularBuffer<rcwl9620::Data>(1)}
     {
         auto ccfg  = component_config();
-        ccfg.clock = 100 * 1000U;  // The datasheet does not specify the I2C speed; use Standard mode
+        ccfg.clock = 100 * 1000U;  // Verified on hardware: 400 kHz fails (NACK) and 150 kHz is unstable
         component_config(ccfg);
     }
     //! @brief Destructor
