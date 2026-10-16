@@ -193,7 +193,10 @@ bool UnitRCWL9620::measureSingleshot(rcwl9620::Data& data)
     for (uint8_t retry = 0; retry < 3; ++retry) {
         bool timeouted{};
         if (request_measurement()) {
-            m5::utility::delay(minimum_interval());
+            // I2C waits for the ranging to finish; GPIO triggers and waits for the echo in read_measurement()
+            if (adapter()->type() == Adapter::Type::I2C) {
+                m5::utility::delay(minimum_interval());
+            }
             if (read_measurement(data, timeouted) && !timeouted) {
                 return true;
             }
