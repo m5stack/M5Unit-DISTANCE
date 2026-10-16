@@ -127,6 +127,9 @@ public:
       @brief Start periodic measurement
       @param interval Measurement interval (ms). Minimum: 150ms for I2C, 50ms for GPIO
       @return True if successful
+      @note With GPIO, update() blocks until the echo pulse ends: about 45 ms with a target at 0.5 m and about
+      90 ms without an echo (the sensor then reports a fixed pulse that reads as 4500 mm). The actual interval
+      is the longer of the interval and the measurement time.
     */
     inline bool startPeriodicMeasurement(const uint32_t interval)
     {
