@@ -35,5 +35,5 @@ protected:
 
 #define RCWL9620_TEST_CLASS TestRCWL9620_IO
 #define MIN_INTERVAL        50
-#define MEDIAN_TOLERANCE    50  // GPIO: pulseInRX takes up to 50ms per measurement
+#define MEDIAN_TOLERANCE    50  // GPIO: a measurement takes about 45 ms with a target and about 90 ms without an echo
 #include "../rcwl9620_test.inl"
