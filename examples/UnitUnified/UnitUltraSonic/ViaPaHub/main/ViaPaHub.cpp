@@ -73,11 +73,6 @@ void setup()
     cfg.interval_ms = INTERVAL_MS;
     unit.config(cfg);
 
-    // The unit under the hub runs at the hub's clock; RCWL-9620 does not respond above 100 kHz
-    auto hub_ccfg  = hub.component_config();
-    hub_ccfg.clock = 100 * 1000U;
-    hub.component_config(hub_ccfg);
-
     if (!hub.add(unit, UNIT_CHANNEL)) {  // PaHub ch:0 -> UnitUltraSonicI2C
         M5_LOGE("Failed to add children");
         m5::unit::wiring::failStop();
