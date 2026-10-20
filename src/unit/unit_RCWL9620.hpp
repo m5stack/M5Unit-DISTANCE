@@ -79,8 +79,10 @@ public:
     explicit UnitRCWL9620(const uint8_t addr = DEFAULT_ADDRESS)
         : Component(addr), _data{new m5::container::CircularBuffer<rcwl9620::Data>(1)}
     {
-        auto ccfg  = component_config();
-        ccfg.clock = 100 * 1000U;  // Verified on hardware: 400 kHz fails (NACK) and 150 kHz is unstable
+        auto ccfg = component_config();
+        // At 100 kHz the sensor can drive SDA too late for the next SCL rising edge, and reads fail
+        // intermittently (more often through a PaHub). 400 kHz fails (NACK)
+        ccfg.clock = 80 * 1000U;
         component_config(ccfg);
     }
     //! @brief Destructor
