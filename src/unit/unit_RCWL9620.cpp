@@ -158,7 +158,7 @@ void UnitRCWL9620::update(const bool force)
 {
     _updated = false;
     if (inPeriodic()) {
-        elapsed_time_t at{m5::utility::millis()};
+        const elapsed_time_t at{m5::utility::millis()};
         if (force || !_latest || m5::utility::hasElapsed(_latest, _interval, at)) {
             bool timeouted{};
             Data d{};
@@ -213,7 +213,8 @@ bool UnitRCWL9620::start_periodic_measurement(const uint32_t interval)
     }
 
     if (interval < minimum_interval()) {
-        M5_LIB_LOGE("Interval must be greater equal %u, (%u)", minimum_interval(), interval);
+        M5_LIB_LOGE("Interval must be greater than or equal to %u (%u)", static_cast<unsigned>(minimum_interval()),
+                    static_cast<unsigned>(interval));
         return false;
     }
 
@@ -229,7 +230,12 @@ bool UnitRCWL9620::start_periodic_measurement(const uint32_t interval)
 bool UnitRCWL9620::stop_periodic_measurement()
 {
     if (inPeriodic()) {
-        // Since the request has already been issued, the value should be retrieved
+        // Nothing is pending with GPIO (measured within update()) or after a failed request
+        if (adapter()->type() != Adapter::Type::I2C || _request_failures) {
+            _periodic = false;
+            return true;
+        }
+        // I2C: the last request has been issued, so read its result
         const auto it      = interval();
         const auto elapsed = m5::utility::elapsedSince(updatedMillis());
         m5::utility::delay(elapsed >= it ? 0 : it - elapsed);

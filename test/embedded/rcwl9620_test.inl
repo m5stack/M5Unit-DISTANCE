@@ -131,4 +131,13 @@ TEST_F(RCWL9620_TEST_CLASS, StopAfterInterval)
     EXPECT_TRUE(unit->stopPeriodicMeasurement());
     EXPECT_LT(m5::utility::elapsedSince(start_at), interval);
     EXPECT_FALSE(unit->inPeriodic());
+
+    // GPIO measures within update(), so stopping does not wait
+    if (unit->adapter()->type() == m5::unit::Adapter::Type::GPIO) {
+        EXPECT_TRUE(unit->startPeriodicMeasurement(interval));
+        const auto stop_at = m5::utility::millis();
+        EXPECT_TRUE(unit->stopPeriodicMeasurement());
+        EXPECT_LT(m5::utility::elapsedSince(stop_at), 10U);
+        EXPECT_FALSE(unit->inPeriodic());
+    }
 }
