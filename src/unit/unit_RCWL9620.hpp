@@ -39,7 +39,7 @@ struct Data {
     //! @return Distance clamped to [MIN_DISTANCE, MAX_DISTANCE]
     inline float distance() const
     {
-        float fd = raw_distance() / 1000.f;
+        const float fd{raw_distance() / 1000.f};
         return std::fmax(std::fmin(fd, MAX_DISTANCE), MIN_DISTANCE);
     }
     //! @brief Get raw distance (um)
@@ -76,6 +76,7 @@ public:
 
     //! @brief Constructor
     //! @param addr I2C address (default: 0x57)
+    //! @note The default I2C clock is 80 kHz (see component_config())
     explicit UnitRCWL9620(const uint8_t addr = DEFAULT_ADDRESS)
         : Component(addr), _data{new m5::container::CircularBuffer<rcwl9620::Data>(1)}
     {
