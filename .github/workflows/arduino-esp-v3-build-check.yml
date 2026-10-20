@@ -159,8 +159,8 @@ jobs:
         run: |
           {
             echo "yaml<<EOF"
-            echo "$REQUIRED_LIBRARIES" | tr ',' '\n' | while read -r lib; do
-              echo "- name: $lib"
+            echo "$REQUIRED_LIBRARIES${{ matrix.extra-libraries }}" | tr ',' '\n' | while read -r lib; do
+              [ -n "$lib" ] && echo "- name: $lib"
             done
             echo "- source-path: ./"
             echo "EOF"
