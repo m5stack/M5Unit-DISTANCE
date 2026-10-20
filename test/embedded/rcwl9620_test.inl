@@ -71,6 +71,7 @@ TEST_F(RCWL9620_TEST_CLASS, Periodic)
 
     EXPECT_FALSE(r.timed_out);
     EXPECT_EQ(r.update_count, STORED_SIZE);
+    EXPECT_GE(r.median(), r.expected_interval);
     EXPECT_LE(r.median(), r.expected_interval + MEDIAN_TOLERANCE);
 
     //
