@@ -180,7 +180,7 @@ public:
 
 protected:
     bool request_measurement();
-    bool read_measurement(rcwl9620::Data& d, bool& timeouted);
+    bool read_measurement(rcwl9620::Data& d, bool& timed_out);
 
     bool start_periodic_measurement(const uint32_t interval);
     bool stop_periodic_measurement();

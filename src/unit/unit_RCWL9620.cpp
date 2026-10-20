@@ -32,15 +32,15 @@ public:
     virtual ~InterfaceI2C()
     {
     }
-    virtual bool read_measurement(Data& d, bool& timeouted) override
+    virtual bool read_measurement(Data& d, bool& timed_out) override
     {
-        timeouted = false;
+        timed_out = false;
         std::fill(d.raw.begin(), d.raw.end(), 0x00);
         if (_unit.readWithTransaction(d.raw.data(), d.raw.size()) == m5::hal::error::error_t::OK) {
             _requested = false;
             return true;
         }
-        timeouted  = true;
+        timed_out  = true;
         _requested = false;
         return false;
     }
@@ -68,9 +68,9 @@ public:
     virtual ~InterfaceGPIO()
     {
     }
-    virtual bool read_measurement(Data& d, bool& timeouted) override
+    virtual bool read_measurement(Data& d, bool& timed_out) override
     {
-        timeouted = false;
+        timed_out = false;
         std::fill(d.raw.begin(), d.raw.end(), 0x00);
 
         // Request
@@ -140,10 +140,10 @@ bool UnitRCWL9620::begin()
     // (sensor may still be busy after MCU software reset)
     for (uint8_t retry = 0; retry < 8; ++retry) {
         Data d{};
-        bool timeouted{};
+        bool timed_out{};
         if (request_measurement()) {
             m5::utility::delay(minimum_interval());
-            if (read_measurement(d, timeouted) && !timeouted) {
+            if (read_measurement(d, timed_out) && !timed_out) {
                 return _cfg.start_periodic ? startPeriodicMeasurement(_cfg.interval_ms) : true;
             }
         }
@@ -160,11 +160,11 @@ void UnitRCWL9620::update(const bool force)
     if (inPeriodic()) {
         const elapsed_time_t at{m5::utility::millis()};
         if (force || !_latest || m5::utility::hasElapsed(_latest, _interval, at)) {
-            bool timeouted{};
+            bool timed_out{};
             Data d{};
             // Nothing to read when the previous request was not accepted
-            _updated = !_request_failures && read_measurement(d, timeouted);
-            if (_updated && !timeouted) {
+            _updated = !_request_failures && read_measurement(d, timed_out);
+            if (_updated && !timed_out) {
                 _data->push_back(d);
             }
             // Re-request for next measurement regardless of read result
@@ -191,13 +191,13 @@ bool UnitRCWL9620::measureSingleshot(rcwl9620::Data& data)
     }
 
     for (uint8_t retry = 0; retry < 3; ++retry) {
-        bool timeouted{};
+        bool timed_out{};
         if (request_measurement()) {
             // I2C waits for the ranging to finish; GPIO triggers and waits for the echo in read_measurement()
             if (adapter()->type() == Adapter::Type::I2C) {
                 m5::utility::delay(minimum_interval());
             }
-            if (read_measurement(data, timeouted) && !timeouted) {
+            if (read_measurement(data, timed_out) && !timed_out) {
                 return true;
             }
         }
@@ -241,10 +241,10 @@ bool UnitRCWL9620::stop_periodic_measurement()
         m5::utility::delay(elapsed >= it ? 0 : it - elapsed);
 
         uint32_t cnt{8};
-        bool timeouted{};
+        bool timed_out{};
         Data discard{};
         do {
-            if (read_measurement(discard, timeouted)) {
+            if (read_measurement(discard, timed_out)) {
                 _periodic = false;
                 return true;
             }
@@ -259,9 +259,9 @@ bool UnitRCWL9620::request_measurement()
     return _interface->request_measurement();
 }
 
-bool UnitRCWL9620::read_measurement(rcwl9620::Data& d, bool& timeouted)
+bool UnitRCWL9620::read_measurement(rcwl9620::Data& d, bool& timed_out)
 {
-    return _interface->read_measurement(d, timeouted);
+    return _interface->read_measurement(d, timed_out);
 }
 
 }  // namespace unit
