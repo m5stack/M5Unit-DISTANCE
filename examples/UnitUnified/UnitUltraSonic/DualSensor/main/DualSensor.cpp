@@ -81,13 +81,13 @@ void setup()
 
     if (use_lcd) {
         // Compute layout based on screen size
-        auto w    = lcd.width();
-        auto h    = lcd.height();
-        panel_h   = h / 2;
-        margin    = w / 40;  // ~2.5% margin
-        bar_x     = margin;
-        bar_w_max = w - margin * 2;
-        bar_h     = panel_h / 4;
+        const auto w = lcd.width();
+        const auto h = lcd.height();
+        panel_h      = h / 2;
+        margin       = w / 40;  // ~2.5% margin
+        bar_x        = margin;
+        bar_w_max    = w - margin * 2;
+        bar_h        = panel_h / 4;
 
         // Choose font size based on screen height
         if (h >= 240) {
@@ -97,9 +97,9 @@ void setup()
         }
 
         for (uint32_t i = 0; i < 2; ++i) {
-            auto fh   = lcd.fontHeight();
-            text_y[i] = panel_h * i + margin;
-            bar_y[i]  = text_y[i] + fh + margin;
+            const auto fh = lcd.fontHeight();
+            text_y[i]     = panel_h * i + margin;
+            bar_y[i]      = text_y[i] + fh + margin;
         }
 
         lcd.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -126,7 +126,7 @@ void loop()
     for (uint32_t i = 0; i < m5::stl::size(unit); ++i) {
         m5::unit::UnitRCWL9620* u = unit[i];
         if (u->updated()) {
-            float dist = u->distance();
+            const float dist{u->distance()};
             M5.Log.printf(">%s_Distance:%f\n>%s_Raw:%" PRIu32 "\n", type_table[i], dist, type_table[i],
                           u->oldest().raw_distance());
 
