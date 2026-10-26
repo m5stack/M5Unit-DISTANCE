@@ -168,8 +168,8 @@ public:
         virtual ~Interface()
         {
         }
-        virtual bool read_measurement(UnitRCWL9620& u, rcwl9620::Data&, bool&) = 0;
-        virtual bool request_measurement(UnitRCWL9620& u)                      = 0;
+        virtual bool read_measurement(UnitRCWL9620& u, rcwl9620::Data& d, bool& timed_out) = 0;
+        virtual bool request_measurement(UnitRCWL9620& u)                                  = 0;
     };
     ///@endcond
 
@@ -180,7 +180,7 @@ protected:
     bool start_periodic_measurement(const uint32_t interval);
     bool stop_periodic_measurement();
 
-    inline Interface* interface()
+    inline Interface* interface() const
     {
         return _interface.get();
     }
