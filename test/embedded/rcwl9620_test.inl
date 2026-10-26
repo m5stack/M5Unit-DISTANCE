@@ -150,9 +150,11 @@ TEST_F(RCWL9620_TEST_CLASS, MeasureAfterMove)
 
     // The moved-to unit must measure through its own adapter, not the moved-from unit
     // Units still refers to the moved-from unit, so Units.update() must not be called in this test
+    const m5::unit::types::elapsed_time_t interval{unit->interval()};
     decltype(unit)::element_type moved{std::move(*unit)};
 
     EXPECT_TRUE(moved.inPeriodic());
+    EXPECT_EQ(moved.interval(), interval);
     EXPECT_TRUE(moved.stopPeriodicMeasurement());
     EXPECT_FALSE(moved.inPeriodic());
 
@@ -162,4 +164,18 @@ TEST_F(RCWL9620_TEST_CLASS, MeasureAfterMove)
         EXPECT_TRUE(moved.measureSingleshot(d));
         EXPECT_TRUE(std::isfinite(d.distance()));
     }
+
+    // Periodic measurement on the moved-to unit stores into the buffer it took over
+    moved.flush();
+    EXPECT_TRUE(moved.startPeriodicMeasurement(MIN_INTERVAL));
+    const uint32_t timeout{std::max<uint32_t>(moved.interval(), 500) * (STORED_SIZE + 1)};
+    const auto r = collect_periodic_measurements(&moved, STORED_SIZE, timeout);
+    EXPECT_TRUE(moved.stopPeriodicMeasurement());
+    EXPECT_FALSE(moved.inPeriodic());
+
+    EXPECT_FALSE(r.timed_out);
+    EXPECT_EQ(r.update_count, STORED_SIZE);
+    EXPECT_EQ(moved.available(), STORED_SIZE);
+    EXPECT_TRUE(moved.full());
+    EXPECT_TRUE(std::isfinite(moved.distance()));
 }
