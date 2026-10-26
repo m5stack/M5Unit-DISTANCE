@@ -103,7 +103,7 @@ jobs:
 #          - m5stack_unit_cams3
 
         platform-version:
-          - 3.3.9
+          - 3.3.10
 
         platform:
           - m5stack
@@ -120,7 +120,7 @@ jobs:
           - unit: UnitUltraSonic
             sketch: DualSensor
             platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.9
+            platform-version: 3.3.10
             platform: m5stack
             archi: esp32
             board: m5stack_core
@@ -129,7 +129,7 @@ jobs:
           - unit: UnitUltraSonic
             sketch: ViaPaHub
             platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.9
+            platform-version: 3.3.10
             platform: m5stack
             archi: esp32
             board: m5stack_core
@@ -137,7 +137,7 @@ jobs:
           - unit: UnitUltraSonic
             sketch: ViaPaHub
             platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.9
+            platform-version: 3.3.10
             platform: m5stack
             archi: esp32
             board: m5stack_cores3
@@ -145,7 +145,7 @@ jobs:
           - unit: UnitUltraSonic
             sketch: ViaPaHub
             platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.9
+            platform-version: 3.3.10
             platform: m5stack
             archi: esp32
             board: m5stack_nano_c6
@@ -153,7 +153,7 @@ jobs:
           - unit: UnitUltraSonic
             sketch: ViaPaHub
             platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.9
+            platform-version: 3.3.10
             platform: m5stack
             archi: esp32
             board: m5stack_nano_h2
@@ -161,7 +161,7 @@ jobs:
           - unit: UnitUltraSonic
             sketch: ViaPaHub
             platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.9
+            platform-version: 3.3.10
             platform: m5stack
             archi: esp32
             board: m5stack_tab5
