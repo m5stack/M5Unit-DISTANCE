@@ -128,17 +128,18 @@ TEST_F(RCWL9620_TEST_CLASS, StopAfterInterval)
     EXPECT_TRUE(unit->startPeriodicMeasurement(interval));
     m5::utility::delay(interval * 2);
 
-    const auto start_at = m5::utility::millis();
+    const m5::utility::elapsed_time_t start_at{m5::utility::millis()};
     EXPECT_TRUE(unit->stopPeriodicMeasurement());
     EXPECT_LT(m5::utility::elapsedSince(start_at), interval);
     EXPECT_FALSE(unit->inPeriodic());
 
     // GPIO measures within update(), so stopping does not wait
     if (unit->adapter()->type() == m5::unit::Adapter::Type::GPIO) {
+        constexpr uint32_t stop_limit_ms{10};
         EXPECT_TRUE(unit->startPeriodicMeasurement(interval));
-        const auto stop_at = m5::utility::millis();
+        const m5::utility::elapsed_time_t stop_at{m5::utility::millis()};
         EXPECT_TRUE(unit->stopPeriodicMeasurement());
-        EXPECT_LT(m5::utility::elapsedSince(stop_at), 10U);
+        EXPECT_LT(m5::utility::elapsedSince(stop_at), stop_limit_ms);
         EXPECT_FALSE(unit->inPeriodic());
     }
 }
@@ -148,6 +149,7 @@ TEST_F(RCWL9620_TEST_CLASS, MeasureAfterMove)
     SCOPED_TRACE(ustr);
 
     // The moved-to unit must measure through its own adapter, not the moved-from unit
+    // Units still refers to the moved-from unit, so Units.update() must not be called in this test
     decltype(unit)::element_type moved{std::move(*unit)};
 
     EXPECT_TRUE(moved.inPeriodic());
