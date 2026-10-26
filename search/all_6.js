@@ -1,11 +1,6 @@
 var searchData=
 [
-  ['unit_0',['unit',['../namespaceunit.html',1,'']]],
-  ['unit_5frcwl9620_2ecpp_1',['unit_RCWL9620.cpp',['../unit___r_c_w_l9620_8cpp.html',1,'']]],
-  ['unit_5frcwl9620_2ehpp_2',['unit_RCWL9620.hpp',['../unit___r_c_w_l9620_8hpp.html',1,'']]],
-  ['unit_5fultrasonic_2ecpp_3',['unit_UltraSonic.cpp',['../unit___ultra_sonic_8cpp.html',1,'']]],
-  ['unit_5fultrasonic_2ehpp_4',['unit_UltraSonic.hpp',['../unit___ultra_sonic_8hpp.html',1,'']]],
-  ['unitrcwl9620_5',['UnitRCWL9620',['../classm5_1_1unit_1_1_unit_r_c_w_l9620.html',1,'m5::unit']]],
-  ['unitultrasonici2c_6',['UnitUltraSonicI2C',['../classm5_1_1unit_1_1_unit_ultra_sonic_i2_c.html',1,'m5::unit']]],
-  ['unitultrasonicio_7',['UnitUltraSonicIO',['../classm5_1_1unit_1_1_unit_ultra_sonic_i_o.html',1,'m5::unit']]]
+  ['start_5fperiodic_0',['start_periodic',['../structm5_1_1unit_1_1_unit_r_c_w_l9620_1_1config__t.html#a945173ad20c42b40b280a3659db05bd9',1,'m5::unit::UnitRCWL9620::config_t']]],
+  ['startperiodicmeasurement_1',['startPeriodicMeasurement',['../classm5_1_1unit_1_1_unit_r_c_w_l9620.html#a86819d5d7fba173f0d99cad840921e1c',1,'m5::unit::UnitRCWL9620']]],
+  ['stopperiodicmeasurement_2',['stopPeriodicMeasurement',['../classm5_1_1unit_1_1_unit_r_c_w_l9620.html#addadc451be0141993d563f11c931dabd',1,'m5::unit::UnitRCWL9620']]]
 ];
