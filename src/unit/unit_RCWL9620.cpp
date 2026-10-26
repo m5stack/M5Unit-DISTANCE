@@ -15,73 +15,73 @@ using namespace m5::unit::types;
 using namespace m5::unit::rcwl9620;
 using namespace m5::unit::rcwl9620::command;
 
-namespace {
-}  // namespace
-
 namespace m5 {
 namespace unit {
+
+namespace {
+// Consecutive request failures that suspend periodic measurement
+constexpr uint8_t MAX_REQUEST_FAILURES{8};
 
 // Class that abstracts the interaction between classes and adapters
 // For I2C
 class InterfaceI2C : public UnitRCWL9620::Interface {
 public:
-    explicit InterfaceI2C(UnitRCWL9620& u) : UnitRCWL9620::Interface(u)
-    {
-    }
     virtual ~InterfaceI2C()
     {
     }
-    virtual bool read_measurement(Data& d, bool& timeouted) override
+    virtual bool read_measurement(UnitRCWL9620& u, Data& d, bool& timed_out) override
     {
-        timeouted = false;
+        timed_out = false;
         std::fill(d.raw.begin(), d.raw.end(), 0x00);
-        if (_unit.readWithTransaction(d.raw.data(), d.raw.size()) == m5::hal::error::error_t::OK) {
+        if (u.readWithTransaction(d.raw.data(), d.raw.size()) == m5::hal::error::error_t::OK) {
             _requested = false;
             return true;
         }
-        timeouted  = true;
+        timed_out  = true;
         _requested = false;
         return false;
     }
-    inline virtual bool request_measurement() override
+    inline virtual bool request_measurement(UnitRCWL9620& u) override
     {
         if (!_requested) {
-            _requested = _unit.writeRegister(MEASURE_DISTANCE, nullptr, 0);
+            _requested = u.writeRegister(MEASURE_DISTANCE, nullptr, 0);
         }
         return _requested;
     }
+
+private:
     bool _requested{};
 };
 
 // For GPIO
 class InterfaceGPIO : public UnitRCWL9620::Interface {
 public:
-    explicit InterfaceGPIO(UnitRCWL9620& u) : UnitRCWL9620::Interface(u)
+    explicit InterfaceGPIO(UnitRCWL9620& u)
     {
-        _unit.pinModeRX(gpio::Mode::Input);
-        _unit.pinModeTX(gpio::Mode::Output);
-        _unit.writeDigitalTX(false);
+        u.pinModeRX(gpio::Mode::Input);
+        u.pinModeTX(gpio::Mode::Output);
+        u.writeDigitalTX(false);
     }
     virtual ~InterfaceGPIO()
     {
     }
-    virtual bool read_measurement(Data& d, bool& timeouted) override
+    virtual bool read_measurement(UnitRCWL9620& u, Data& d, bool& timed_out) override
     {
-        timeouted = false;
+        timed_out = false;
         std::fill(d.raw.begin(), d.raw.end(), 0x00);
 
         // Request
-        _unit.writeDigitalTX(LOW);
+        u.writeDigitalTX(false);
         m5::utility::delayMicroseconds(2);
-        _unit.writeDigitalTX(HIGH);
+        u.writeDigitalTX(true);
         m5::utility::delayMicroseconds(20);
-        _unit.writeDigitalTX(LOW);
+        u.writeDigitalTX(false);
 
         // Read
         // @note Speed of sound is fixed at 343 m/s (approx. 20 deg C).
         // No temperature compensation; error up to +/-7% over 0-40 deg C range.
         uint32_t duration{};
-        if (!_unit.pulseInRX(duration, HIGH, 50000)) {
+        if (!u.pulseInRX(duration, 1 /* HIGH pulse */, 50000)) {
             return false;
         }
 
@@ -91,12 +91,13 @@ public:
         d.raw[2]                   = distance_um & 0xFF;
         return true;
     }
-    virtual bool request_measurement() override
+    virtual bool request_measurement(UnitRCWL9620&) override
     {
         // Ignored because request and read are not separated by GPIO
         return true;
     }
 };
+}  // namespace
 
 // class UnitRCWL9620
 const char UnitRCWL9620::name[] = "UnitRCWL9620";
@@ -119,7 +120,7 @@ bool UnitRCWL9620::begin()
     auto atype = adapter()->type();
     switch (atype) {
         case Adapter::Type::I2C:
-            _interface.reset(new InterfaceI2C(*this));
+            _interface.reset(new InterfaceI2C());
             break;
         case Adapter::Type::GPIO:
             _interface.reset(new InterfaceGPIO(*this));
@@ -136,10 +137,10 @@ bool UnitRCWL9620::begin()
     // (sensor may still be busy after MCU software reset)
     for (uint8_t retry = 0; retry < 8; ++retry) {
         Data d{};
-        bool timeouted{};
+        bool timed_out{};
         if (request_measurement()) {
             m5::utility::delay(minimum_interval());
-            if (read_measurement(d, timeouted) && !timeouted) {
+            if (read_measurement(d, timed_out) && !timed_out) {
                 return _cfg.start_periodic ? startPeriodicMeasurement(_cfg.interval_ms) : true;
             }
         }
@@ -154,21 +155,27 @@ void UnitRCWL9620::update(const bool force)
 {
     _updated = false;
     if (inPeriodic()) {
-        elapsed_time_t at{m5::utility::millis()};
-        if (force || !_latest || at >= _latest + _interval) {
-            bool timeouted{};
+        const elapsed_time_t at{m5::utility::millis()};
+        if (force || !_latest || m5::utility::hasElapsed(_latest, _interval, at)) {
+            bool timed_out{};
             Data d{};
-            _updated = read_measurement(d, timeouted);
-            if (_updated && !timeouted) {
+            // Nothing to read when the previous request was not accepted
+            _updated = !_request_failures && read_measurement(d, timed_out);
+            if (_updated && !timed_out) {
                 _data->push_back(d);
             }
             // Re-request for next measurement regardless of read result
-            if (!request_measurement()) {
+            if (request_measurement()) {
+                _request_failures = 0;
+            } else if (++_request_failures >= MAX_REQUEST_FAILURES) {
                 _periodic = false;
                 M5_LIB_LOGE("Periodic measurements have been suspended");
                 return;
+            } else {
+                M5_LIB_LOGW("Failed to request a measurement (%u), retry at the next interval",
+                            static_cast<unsigned>(_request_failures));
             }
-            _latest = m5::utility::millis();
+            _latest = at;
         }
     }
 }
@@ -181,10 +188,13 @@ bool UnitRCWL9620::measureSingleshot(rcwl9620::Data& data)
     }
 
     for (uint8_t retry = 0; retry < 3; ++retry) {
-        bool timeouted{};
+        bool timed_out{};
         if (request_measurement()) {
-            m5::utility::delay(minimum_interval());
-            if (read_measurement(data, timeouted) && !timeouted) {
+            // I2C waits for the ranging to finish; GPIO triggers and waits for the echo in read_measurement()
+            if (adapter()->type() == Adapter::Type::I2C) {
+                m5::utility::delay(minimum_interval());
+            }
+            if (read_measurement(data, timed_out) && !timed_out) {
                 return true;
             }
         }
@@ -200,14 +210,16 @@ bool UnitRCWL9620::start_periodic_measurement(const uint32_t interval)
     }
 
     if (interval < minimum_interval()) {
-        M5_LIB_LOGE("Interval must be greater equal %u, (%u)", minimum_interval(), interval);
+        M5_LIB_LOGE("Interval must be greater than or equal to %u (%u)", static_cast<unsigned>(minimum_interval()),
+                    static_cast<unsigned>(interval));
         return false;
     }
 
     _periodic = request_measurement();
     if (_periodic) {
-        _interval = interval;
-        _latest   = m5::utility::millis();
+        _request_failures = 0;
+        _interval         = interval;
+        _latest           = m5::utility::millis();
     }
     return _periodic;
 }
@@ -215,19 +227,21 @@ bool UnitRCWL9620::start_periodic_measurement(const uint32_t interval)
 bool UnitRCWL9620::stop_periodic_measurement()
 {
     if (inPeriodic()) {
-        // Since the request has already been issued, the value should be retrieved
-        auto it  = interval();
-        auto dms = it - (m5::utility::millis() - updatedMillis());
-        if (dms > it) {
-            dms = it;
+        // Nothing is pending with GPIO (measured within update()) or after a failed request
+        if (adapter()->type() != Adapter::Type::I2C || _request_failures) {
+            _periodic = false;
+            return true;
         }
-        m5::utility::delay(dms);
+        // I2C: the last request has been issued, so read its result
+        const auto it      = interval();
+        const auto elapsed = m5::utility::elapsedSince(updatedMillis());
+        m5::utility::delay(elapsed >= it ? 0 : it - elapsed);
 
         uint32_t cnt{8};
-        bool timeouted{};
+        bool timed_out{};
         Data discard{};
         do {
-            if (read_measurement(discard, timeouted)) {
+            if (read_measurement(discard, timed_out)) {
                 _periodic = false;
                 return true;
             }
@@ -239,12 +253,12 @@ bool UnitRCWL9620::stop_periodic_measurement()
 
 bool UnitRCWL9620::request_measurement()
 {
-    return _interface->request_measurement();
+    return _interface->request_measurement(*this);
 }
 
-bool UnitRCWL9620::read_measurement(rcwl9620::Data& d, bool& timeouted)
+bool UnitRCWL9620::read_measurement(rcwl9620::Data& d, bool& timed_out)
 {
-    return _interface->read_measurement(d, timeouted);
+    return _interface->read_measurement(*this, d, timed_out);
 }
 
 }  // namespace unit

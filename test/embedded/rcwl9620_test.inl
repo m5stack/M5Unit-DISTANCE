@@ -24,13 +24,42 @@
 #endif
 // clang-format on
 
+TEST_F(RCWL9620_TEST_CLASS, BeginAppliesConfig)
+{
+    SCOPED_TRACE(ustr);
+
+    // begin() cannot start periodic measurement while it is already running
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+
+    auto cfg           = unit->config();
+    cfg.start_periodic = false;
+    unit->config(cfg);
+    EXPECT_TRUE(unit->begin());
+    EXPECT_FALSE(unit->inPeriodic());
+
+    cfg.start_periodic = true;
+    cfg.interval_ms    = MIN_INTERVAL + 50;
+    unit->config(cfg);
+    EXPECT_TRUE(unit->begin());
+    EXPECT_TRUE(unit->inPeriodic());
+    EXPECT_EQ(unit->interval(), MIN_INTERVAL + 50U);
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+
+    cfg.interval_ms = MIN_INTERVAL - 1;
+    unit->config(cfg);
+    EXPECT_FALSE(unit->begin());
+    EXPECT_FALSE(unit->inPeriodic());
+}
+
 TEST_F(RCWL9620_TEST_CLASS, Periodic)
 {
     SCOPED_TRACE(ustr);
 
     EXPECT_TRUE(unit->inPeriodic());
-    EXPECT_FALSE(unit->startPeriodicMeasurement(MIN_INTERVAL - 1));
+    EXPECT_FALSE(unit->startPeriodicMeasurement(MIN_INTERVAL));  // Already running
     EXPECT_TRUE(unit->stopPeriodicMeasurement());
+    EXPECT_FALSE(unit->inPeriodic());
+    EXPECT_FALSE(unit->startPeriodicMeasurement(MIN_INTERVAL - 1));  // Below the minimum interval
     EXPECT_FALSE(unit->inPeriodic());
 
     EXPECT_TRUE(unit->startPeriodicMeasurement(MIN_INTERVAL));
@@ -42,6 +71,7 @@ TEST_F(RCWL9620_TEST_CLASS, Periodic)
 
     EXPECT_FALSE(r.timed_out);
     EXPECT_EQ(r.update_count, STORED_SIZE);
+    EXPECT_GE(r.median(), r.expected_interval);
     EXPECT_LE(r.median(), r.expected_interval + MEDIAN_TOLERANCE);
 
     //
@@ -85,4 +115,67 @@ TEST_F(RCWL9620_TEST_CLASS, Singleshot)
         EXPECT_TRUE(unit->measureSingleshot(d));
         EXPECT_TRUE(std::isfinite(d.distance()));
     }
+}
+
+TEST_F(RCWL9620_TEST_CLASS, StopAfterInterval)
+{
+    SCOPED_TRACE(ustr);
+
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+
+    // Stopping after the interval has passed must not wait for another interval
+    constexpr uint32_t interval{MIN_INTERVAL * 4};
+    EXPECT_TRUE(unit->startPeriodicMeasurement(interval));
+    m5::utility::delay(interval * 2);
+
+    const m5::utility::elapsed_time_t start_at{m5::utility::millis()};
+    EXPECT_TRUE(unit->stopPeriodicMeasurement());
+    EXPECT_LT(m5::utility::elapsedSince(start_at), interval);
+    EXPECT_FALSE(unit->inPeriodic());
+
+    // GPIO measures within update(), so stopping does not wait
+    if (unit->adapter()->type() == m5::unit::Adapter::Type::GPIO) {
+        constexpr uint32_t stop_limit_ms{10};
+        EXPECT_TRUE(unit->startPeriodicMeasurement(interval));
+        const m5::utility::elapsed_time_t stop_at{m5::utility::millis()};
+        EXPECT_TRUE(unit->stopPeriodicMeasurement());
+        EXPECT_LT(m5::utility::elapsedSince(stop_at), stop_limit_ms);
+        EXPECT_FALSE(unit->inPeriodic());
+    }
+}
+
+TEST_F(RCWL9620_TEST_CLASS, MeasureAfterMove)
+{
+    SCOPED_TRACE(ustr);
+
+    // The moved-to unit must measure through its own adapter, not the moved-from unit
+    // Units still refers to the moved-from unit, so Units.update() must not be called in this test
+    const m5::unit::types::elapsed_time_t interval{unit->interval()};
+    decltype(unit)::element_type moved{std::move(*unit)};
+
+    EXPECT_TRUE(moved.inPeriodic());
+    EXPECT_EQ(moved.interval(), interval);
+    EXPECT_TRUE(moved.stopPeriodicMeasurement());
+    EXPECT_FALSE(moved.inPeriodic());
+
+    Data d{};
+    uint32_t cnt{8};
+    while (cnt--) {
+        EXPECT_TRUE(moved.measureSingleshot(d));
+        EXPECT_TRUE(std::isfinite(d.distance()));
+    }
+
+    // Periodic measurement on the moved-to unit stores into the buffer it took over
+    moved.flush();
+    EXPECT_TRUE(moved.startPeriodicMeasurement(MIN_INTERVAL));
+    const uint32_t timeout{std::max<uint32_t>(moved.interval(), 500) * (STORED_SIZE + 1)};
+    const auto r = collect_periodic_measurements(&moved, STORED_SIZE, timeout);
+    EXPECT_TRUE(moved.stopPeriodicMeasurement());
+    EXPECT_FALSE(moved.inPeriodic());
+
+    EXPECT_FALSE(r.timed_out);
+    EXPECT_EQ(r.update_count, STORED_SIZE);
+    EXPECT_EQ(moved.available(), STORED_SIZE);
+    EXPECT_TRUE(moved.full());
+    EXPECT_TRUE(std::isfinite(moved.distance()));
 }

@@ -49,7 +49,7 @@ public:
     virtual bool begin() override;
 
 protected:
-    inline virtual uint32_t minimum_interval() const
+    inline virtual uint32_t minimum_interval() const override
     {
         return 50;
     }

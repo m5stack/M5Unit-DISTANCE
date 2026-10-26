@@ -39,7 +39,7 @@ struct Data {
     //! @return Distance clamped to [MIN_DISTANCE, MAX_DISTANCE]
     inline float distance() const
     {
-        float fd = raw_distance() / 1000.f;
+        const float fd{raw_distance() / 1000.f};
         return std::fmax(std::fmin(fd, MAX_DISTANCE), MIN_DISTANCE);
     }
     //! @brief Get raw distance (um)
@@ -76,13 +76,17 @@ public:
 
     //! @brief Constructor
     //! @param addr I2C address (default: 0x57)
+    //! @note The default I2C clock is 80 kHz (see component_config())
     explicit UnitRCWL9620(const uint8_t addr = DEFAULT_ADDRESS)
         : Component(addr), _data{new m5::container::CircularBuffer<rcwl9620::Data>(1)}
     {
-        auto ccfg  = component_config();
-        ccfg.clock = 100 * 1000U;
+        auto ccfg = component_config();
+        // At 100 kHz the sensor can drive SDA too late for the next SCL rising edge, and reads fail
+        // intermittently (more often through a PaHub). 400 kHz fails (NACK)
+        ccfg.clock = 80 * 1000U;
         component_config(ccfg);
     }
+    //! @brief Destructor
     virtual ~UnitRCWL9620()
     {
     }
@@ -98,7 +102,7 @@ public:
     ///@{
     /*! @brief Gets the configuration
       @return Copy of current configuration */
-    inline config_t config()
+    inline config_t config() const
     {
         return _cfg;
     }
@@ -126,6 +130,9 @@ public:
       @brief Start periodic measurement
       @param interval Measurement interval (ms). Minimum: 150ms for I2C, 50ms for GPIO
       @return True if successful
+      @note With GPIO, update() blocks until the echo pulse ends: about 45 ms with a target at 0.5 m and about
+      90 ms without an echo (the sensor then reports a fixed pulse that reads as 4500 mm). The actual interval
+      is the longer of the interval and the measurement time.
     */
     inline bool startPeriodicMeasurement(const uint32_t interval)
     {
@@ -147,38 +154,33 @@ public:
       @brief Measurement single shot
       @param[out] data Measured data
       @return True if successful
-      @warning During periodic detection runs, an error is returned
+      @warning Returns false while periodic measurement is running
       @warning Blocked until measurement is complete
     */
     bool measureSingleshot(rcwl9620::Data& data);
     ///@}
 
-    ///@cond0
+    ///@cond
     // Class that abstracts the interaction between classes and adapters
+    // The owning unit is passed on each call instead of being stored, so the unit stays safe to move
     class Interface {
     public:
-        explicit Interface(UnitRCWL9620& u) : _unit{u}
-        {
-        }
         virtual ~Interface()
         {
         }
-        virtual bool read_measurement(rcwl9620::Data&, bool&) = 0;
-        virtual bool request_measurement()                    = 0;
-
-    protected:
-        UnitRCWL9620& _unit;
+        virtual bool read_measurement(UnitRCWL9620& u, rcwl9620::Data& d, bool& timed_out) = 0;
+        virtual bool request_measurement(UnitRCWL9620& u)                                  = 0;
     };
     ///@endcond
 
 protected:
     bool request_measurement();
-    bool read_measurement(rcwl9620::Data& d, bool& timeouted);
+    bool read_measurement(rcwl9620::Data& d, bool& timed_out);
 
     bool start_periodic_measurement(const uint32_t interval);
     bool stop_periodic_measurement();
 
-    inline Interface* interface()
+    inline Interface* interface() const
     {
         return _interface.get();
     }
@@ -189,22 +191,18 @@ protected:
 
     inline virtual uint32_t minimum_interval() const
     {
-        // Datasheet says
-        // 向模块写入 0X01 ，模块开始测距；等待 100mS 模块最大测距时间
-        // Note : Max is assumed to be 50+100 since there is no description of Max.
-        // A larger value would be considered better?
-
-        // As a result of the experiment, it seems that in 100ms, 263 in requestFrom is returned in many cases.
-        // Therefore, the value should be increased.
+        // The datasheet gives 100 ms as the maximum ranging time after writing MEASURE_DISTANCE (0x01).
+        // Reading after 100 ms often fails with ESP_ERR_TIMEOUT (263), so 150 ms is used.
         return 150;  // for I2C
     }
 
 private:
     std::unique_ptr<Interface> _interface{};
     config_t _cfg{};
+    uint8_t _request_failures{};  // Consecutive failures to request the next periodic measurement
 };
 
-///@cond 0
+///@cond
 namespace rcwl9620 {
 namespace command {
 constexpr uint8_t MEASURE_DISTANCE{0x01};
