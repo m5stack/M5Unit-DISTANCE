@@ -124,7 +124,7 @@ void loop()
     Units.update();
 
     for (uint32_t i = 0; i < m5::stl::size(unit); ++i) {
-        m5::unit::UnitRCWL9620* u = unit[i];
+        const m5::unit::UnitRCWL9620* u = unit[i];
         if (u->updated()) {
             const float dist{u->distance()};
             M5.Log.printf(">%s_Distance:%f\n>%s_Raw:%" PRIu32 "\n", type_table[i], dist, type_table[i],
@@ -132,7 +132,7 @@ void loop()
 
             if (use_lcd) {
                 // Bar width proportional to distance (0-4500mm)
-                int32_t bar_w = (int32_t)(dist / Data::MAX_DISTANCE * bar_w_max);
+                int32_t bar_w = static_cast<int32_t>(dist / Data::MAX_DISTANCE * bar_w_max);
                 if (bar_w > bar_w_max) {
                     bar_w = bar_w_max;
                 }
@@ -144,7 +144,7 @@ void loop()
 
                 // Numeric value (right-aligned)
                 lcd.setTextColor(TFT_WHITE, TFT_BLACK);
-                auto text_x = margin + lcd.textWidth("[GPIO] ");
+                const int32_t text_x{margin + lcd.textWidth("[GPIO] ")};
                 lcd.setCursor(text_x, text_y[i]);
                 lcd.printf("%7.2f mm", dist);
 
