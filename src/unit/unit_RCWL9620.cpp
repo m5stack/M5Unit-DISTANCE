@@ -26,17 +26,14 @@ constexpr uint8_t MAX_REQUEST_FAILURES{8};
 // For I2C
 class InterfaceI2C : public UnitRCWL9620::Interface {
 public:
-    explicit InterfaceI2C(UnitRCWL9620& u) : UnitRCWL9620::Interface(u)
-    {
-    }
     virtual ~InterfaceI2C()
     {
     }
-    virtual bool read_measurement(Data& d, bool& timed_out) override
+    virtual bool read_measurement(UnitRCWL9620& u, Data& d, bool& timed_out) override
     {
         timed_out = false;
         std::fill(d.raw.begin(), d.raw.end(), 0x00);
-        if (_unit.readWithTransaction(d.raw.data(), d.raw.size()) == m5::hal::error::error_t::OK) {
+        if (u.readWithTransaction(d.raw.data(), d.raw.size()) == m5::hal::error::error_t::OK) {
             _requested = false;
             return true;
         }
@@ -44,10 +41,10 @@ public:
         _requested = false;
         return false;
     }
-    inline virtual bool request_measurement() override
+    inline virtual bool request_measurement(UnitRCWL9620& u) override
     {
         if (!_requested) {
-            _requested = _unit.writeRegister(MEASURE_DISTANCE, nullptr, 0);
+            _requested = u.writeRegister(MEASURE_DISTANCE, nullptr, 0);
         }
         return _requested;
     }
@@ -59,32 +56,32 @@ private:
 // For GPIO
 class InterfaceGPIO : public UnitRCWL9620::Interface {
 public:
-    explicit InterfaceGPIO(UnitRCWL9620& u) : UnitRCWL9620::Interface(u)
+    explicit InterfaceGPIO(UnitRCWL9620& u)
     {
-        _unit.pinModeRX(gpio::Mode::Input);
-        _unit.pinModeTX(gpio::Mode::Output);
-        _unit.writeDigitalTX(false);
+        u.pinModeRX(gpio::Mode::Input);
+        u.pinModeTX(gpio::Mode::Output);
+        u.writeDigitalTX(false);
     }
     virtual ~InterfaceGPIO()
     {
     }
-    virtual bool read_measurement(Data& d, bool& timed_out) override
+    virtual bool read_measurement(UnitRCWL9620& u, Data& d, bool& timed_out) override
     {
         timed_out = false;
         std::fill(d.raw.begin(), d.raw.end(), 0x00);
 
         // Request
-        _unit.writeDigitalTX(false);
+        u.writeDigitalTX(false);
         m5::utility::delayMicroseconds(2);
-        _unit.writeDigitalTX(true);
+        u.writeDigitalTX(true);
         m5::utility::delayMicroseconds(20);
-        _unit.writeDigitalTX(false);
+        u.writeDigitalTX(false);
 
         // Read
         // @note Speed of sound is fixed at 343 m/s (approx. 20 deg C).
         // No temperature compensation; error up to +/-7% over 0-40 deg C range.
         uint32_t duration{};
-        if (!_unit.pulseInRX(duration, 1 /* HIGH pulse */, 50000)) {
+        if (!u.pulseInRX(duration, 1 /* HIGH pulse */, 50000)) {
             return false;
         }
 
@@ -94,7 +91,7 @@ public:
         d.raw[2]                   = distance_um & 0xFF;
         return true;
     }
-    virtual bool request_measurement() override
+    virtual bool request_measurement(UnitRCWL9620&) override
     {
         // Ignored because request and read are not separated by GPIO
         return true;
@@ -123,7 +120,7 @@ bool UnitRCWL9620::begin()
     auto atype = adapter()->type();
     switch (atype) {
         case Adapter::Type::I2C:
-            _interface.reset(new InterfaceI2C(*this));
+            _interface.reset(new InterfaceI2C());
             break;
         case Adapter::Type::GPIO:
             _interface.reset(new InterfaceGPIO(*this));
@@ -256,12 +253,12 @@ bool UnitRCWL9620::stop_periodic_measurement()
 
 bool UnitRCWL9620::request_measurement()
 {
-    return _interface->request_measurement();
+    return _interface->request_measurement(*this);
 }
 
 bool UnitRCWL9620::read_measurement(rcwl9620::Data& d, bool& timed_out)
 {
-    return _interface->read_measurement(d, timed_out);
+    return _interface->read_measurement(*this, d, timed_out);
 }
 
 }  // namespace unit

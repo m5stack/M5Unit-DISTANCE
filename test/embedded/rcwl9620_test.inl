@@ -142,3 +142,22 @@ TEST_F(RCWL9620_TEST_CLASS, StopAfterInterval)
         EXPECT_FALSE(unit->inPeriodic());
     }
 }
+
+TEST_F(RCWL9620_TEST_CLASS, MeasureAfterMove)
+{
+    SCOPED_TRACE(ustr);
+
+    // The moved-to unit must measure through its own adapter, not the moved-from unit
+    decltype(unit)::element_type moved{std::move(*unit)};
+
+    EXPECT_TRUE(moved.inPeriodic());
+    EXPECT_TRUE(moved.stopPeriodicMeasurement());
+    EXPECT_FALSE(moved.inPeriodic());
+
+    Data d{};
+    uint32_t cnt{8};
+    while (cnt--) {
+        EXPECT_TRUE(moved.measureSingleshot(d));
+        EXPECT_TRUE(std::isfinite(d.distance()));
+    }
+}

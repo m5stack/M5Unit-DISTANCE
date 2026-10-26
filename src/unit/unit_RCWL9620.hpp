@@ -162,19 +162,14 @@ public:
 
     ///@cond
     // Class that abstracts the interaction between classes and adapters
+    // The owning unit is passed on each call instead of being stored, so the unit stays safe to move
     class Interface {
     public:
-        explicit Interface(UnitRCWL9620& u) : _unit{u}
-        {
-        }
         virtual ~Interface()
         {
         }
-        virtual bool read_measurement(rcwl9620::Data&, bool&) = 0;
-        virtual bool request_measurement()                    = 0;
-
-    protected:
-        UnitRCWL9620& _unit;
+        virtual bool read_measurement(UnitRCWL9620& u, rcwl9620::Data&, bool&) = 0;
+        virtual bool request_measurement(UnitRCWL9620& u)                      = 0;
     };
     ///@endcond
 
