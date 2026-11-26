@@ -69,7 +69,7 @@ jobs:
           - UnitUltraSonicIO
 
         board:
-          # Reduced from 19 to 5 boards: one per compile config (chip arch x platform).
+          # Reduced from 20 to 6 boards: one per compile config (chip arch x platform).
           # The other boards differ only in the variant header, so the library code compiles the same.
           - Core
 #          - Core2  # ESP32: represented by Core
@@ -90,6 +90,7 @@ jobs:
 #          - Cardputer  # ESP32-S3: represented by CoreS3
           - Tab5
 #          - NessoN1  # ESP32-C6: represented by NanoC6
+          - ToughC5  # ESP32-C5
 
         framework:
           - Arduino
@@ -140,6 +141,11 @@ jobs:
 #            board: NessoN1
 #            framework: Arduino
 #            espressif32: latest
+          - example: ViaPaHub
+            unit: UnitUltraSonicI2C
+            board: ToughC5
+            framework: Arduino
+            espressif32: latest
 
     steps:
       - name: Checkout
