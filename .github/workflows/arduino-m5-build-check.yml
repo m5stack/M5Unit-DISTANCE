@@ -126,7 +126,8 @@ jobs:
             archi: esp32
             board: m5stack_core
             build-properties: ""
-          # ViaPaHub (UnitUltraSonicI2C through UnitPaHub): one board per chip
+          # ViaPaHub (UnitUltraSonicI2C through UnitPaHub): the representative board only. It adds only the example and the
+          # M5Unit-HUB sources to the build; the library and the wiring helper are built per chip by PlotToSerial.
           - unit: UnitUltraSonic
             sketch: ViaPaHub
             platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
@@ -135,46 +136,46 @@ jobs:
             archi: esp32
             board: m5stack_core
             build-properties: ""
-          - unit: UnitUltraSonic
-            sketch: ViaPaHub
-            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.10
-            platform: m5stack
-            archi: esp32
-            board: m5stack_cores3
-            build-properties: ""
-          - unit: UnitUltraSonic
-            sketch: ViaPaHub
-            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.10
-            platform: m5stack
-            archi: esp32
-            board: m5stack_nano_c6
-            build-properties: ""
-          - unit: UnitUltraSonic
-            sketch: ViaPaHub
-            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.10
-            platform: m5stack
-            archi: esp32
-            board: m5stack_nano_h2
-            build-properties: ""
-          - unit: UnitUltraSonic
-            sketch: ViaPaHub
-            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.10
-            platform: m5stack
-            archi: esp32
-            board: m5stack_tab5
-            build-properties: ""
-          - unit: UnitUltraSonic
-            sketch: ViaPaHub
-            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
-            platform-version: 3.3.10
-            platform: m5stack
-            archi: esp32
-            board: m5stack_toughc5
-            build-properties: ""
+#          - unit: UnitUltraSonic  # Hub sources per chip are built by the M5Unit-HUB CI
+#            sketch: ViaPaHub
+#            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
+#            platform-version: 3.3.10
+#            platform: m5stack
+#            archi: esp32
+#            board: m5stack_cores3
+#            build-properties: ""
+#          - unit: UnitUltraSonic  # Hub sources per chip are built by the M5Unit-HUB CI
+#            sketch: ViaPaHub
+#            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
+#            platform-version: 3.3.10
+#            platform: m5stack
+#            archi: esp32
+#            board: m5stack_nano_c6
+#            build-properties: ""
+#          - unit: UnitUltraSonic  # Hub sources per chip are built by the M5Unit-HUB CI
+#            sketch: ViaPaHub
+#            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
+#            platform-version: 3.3.10
+#            platform: m5stack
+#            archi: esp32
+#            board: m5stack_nano_h2
+#            build-properties: ""
+#          - unit: UnitUltraSonic  # Hub sources per chip are built by the M5Unit-HUB CI
+#            sketch: ViaPaHub
+#            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
+#            platform-version: 3.3.10
+#            platform: m5stack
+#            archi: esp32
+#            board: m5stack_tab5
+#            build-properties: ""
+#          - unit: UnitUltraSonic  # Hub sources per chip are built by the M5Unit-HUB CI
+#            sketch: ViaPaHub
+#            platform-url: https://m5stack.oss-cn-shenzhen.aliyuncs.com/resource/arduino/package_m5stack_index.json
+#            platform-version: 3.3.10
+#            platform: m5stack
+#            archi: esp32
+#            board: m5stack_toughc5
+#            build-properties: ""
 
     steps:
       - name: Checkout

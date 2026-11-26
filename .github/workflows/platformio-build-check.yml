@@ -110,42 +110,43 @@ jobs:
 #            board: NessoN1
 #            framework: Arduino
 #            espressif32: latest
-          # ViaPaHub (UnitUltraSonicI2C through UnitPaHub): one board per chip
+          # ViaPaHub (UnitUltraSonicI2C through UnitPaHub): the representative board only. It adds only the example and the
+          # M5Unit-HUB sources to the build; the library and the wiring helper are built per chip by PlotToSerial.
           - example: ViaPaHub
             unit: UnitUltraSonicI2C
             board: Core
             framework: Arduino
             espressif32: latest
-          - example: ViaPaHub
-            unit: UnitUltraSonicI2C
-            board: CoreS3
-            framework: Arduino
-            espressif32: latest
-          - example: ViaPaHub
-            unit: UnitUltraSonicI2C
-            board: NanoC6
-            framework: Arduino
-            espressif32: latest
-          - example: ViaPaHub
-            unit: UnitUltraSonicI2C
-            board: NanoH2
-            framework: Arduino
-            espressif32: latest
-          - example: ViaPaHub
-            unit: UnitUltraSonicI2C
-            board: Tab5
-            framework: Arduino
-            espressif32: latest
-#          - example: ViaPaHub  # ESP32-C6: represented by NanoC6
+#          - example: ViaPaHub  # Hub sources per chip are built by the M5Unit-HUB CI
+#            unit: UnitUltraSonicI2C
+#            board: CoreS3
+#            framework: Arduino
+#            espressif32: latest
+#          - example: ViaPaHub  # Hub sources per chip are built by the M5Unit-HUB CI
+#            unit: UnitUltraSonicI2C
+#            board: NanoC6
+#            framework: Arduino
+#            espressif32: latest
+#          - example: ViaPaHub  # Hub sources per chip are built by the M5Unit-HUB CI
+#            unit: UnitUltraSonicI2C
+#            board: NanoH2
+#            framework: Arduino
+#            espressif32: latest
+#          - example: ViaPaHub  # Hub sources per chip are built by the M5Unit-HUB CI
+#            unit: UnitUltraSonicI2C
+#            board: Tab5
+#            framework: Arduino
+#            espressif32: latest
+#          - example: ViaPaHub  # Hub sources per chip are built by the M5Unit-HUB CI
 #            unit: UnitUltraSonicI2C
 #            board: NessoN1
 #            framework: Arduino
 #            espressif32: latest
-          - example: ViaPaHub
-            unit: UnitUltraSonicI2C
-            board: ToughC5
-            framework: Arduino
-            espressif32: latest
+#          - example: ViaPaHub  # Hub sources per chip are built by the M5Unit-HUB CI
+#            unit: UnitUltraSonicI2C
+#            board: ToughC5
+#            framework: Arduino
+#            espressif32: latest
 
     steps:
       - name: Checkout
