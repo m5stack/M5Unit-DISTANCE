@@ -64,8 +64,9 @@ jobs:
         # Every chip is built on every boundary, because chip-specific code (wiring helper branches, M5Unified /
         # M5GFX per-chip paths, the CONFIG_FREERTOS_UNICORE feedIdle branch), the Xtensa / RISC-V toolchains and the
         # legacy I2C driver on 5.1.7 differ per chip, and esp32 alone does not catch their warnings.
-        # The idf axis is built for the I2C connection only, because the I2C driver is what changes across these
-        # versions (__has_include(<driver/i2c_master.h>)); GPIO is built on every chip with the latest 5.x.
+        # I2C is built on all four boundaries, because the I2C driver changes across them
+        # (__has_include(<driver/i2c_master.h>)). GPIO is built on 5.1.7 / 5.5.4 / 6.1: the non-I2C paths of
+        # M5UnitUnified change at 5.1.7 and at 6.1 (-Werror, GCC 15), while 5.4.4 takes the same path as 5.5.4.
         connection: [I2C, GPIO]
         target: [esp32, esp32s3, esp32c3, esp32c5, esp32c6, esp32h2, esp32p4]
         idf: [v5.1.7, v5.4.4, v5.5.4, v6.1]
@@ -73,9 +74,7 @@ jobs:
           - {target: esp32c5, idf: v5.1.7}   # C5 is supported from IDF 5.5 (preview target on 5.4)
           - {target: esp32c5, idf: v5.4.4}
           - {target: esp32p4, idf: v5.1.7}   # P4 is supported from IDF 5.3
-          - {connection: GPIO, idf: v5.1.7}
-          - {connection: GPIO, idf: v5.4.4}
-          - {connection: GPIO, idf: v6.1}
+          - {connection: GPIO, idf: v5.4.4}  # Same non-I2C path as v5.5.4
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -97,9 +96,9 @@ jobs:
 
   # DualSensor (I2C + GPIO units together) and ViaPaHub (M5Unit-HUB, example-only dependency) only add example code on
   # top of the library, whose chip and idf axes are already covered by build-chips. Build them on the representative
-  # chip with the latest 5.x only.
+  # chip with the latest IDF only, whose warnings are the strictest (-Werror defaults, GCC 15 / C++26).
   build-examples:
-    name: v5.5.4 esp32 ${{ matrix.example }}
+    name: v6.1 esp32 ${{ matrix.example }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -116,6 +115,6 @@ jobs:
       - name: ESP-IDF build
         uses: espressif/esp-idf-ci-action@v1
         with:
-          esp_idf_version: v5.5.4
+          esp_idf_version: v6.1
           target: esp32
           path: examples/UnitUnified/${{ matrix.example }}
