@@ -56,7 +56,7 @@ You must choose a define symbol for the connection method you will use.
 
 ### For ESP-IDF settings
 
-> **NOTE:** The ESP-IDF native build (`idf.py`) targets ESP-IDF **5.1 or later** (5.x and 6.x).
+> **NOTE:** The ESP-IDF native build (`idf.py`) targets ESP-IDF **5.1 or later** (5.x and 6.x). ESP32-P4 requires 5.3 or later, and ESP32-C5 requires 5.5 or later.
 
 - PlotToSerial  
 Choose the connection with `idf.py menuconfig` → `M5Unit-DISTANCE PlotToSerial example` → `Connection`
